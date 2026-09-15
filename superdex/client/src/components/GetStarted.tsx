@@ -105,7 +105,7 @@ export default function GetStarted() {
               color: "oklch(0.45 0 0)",
             }}
           >
-            Prerequisites: CMake 3.25+ · Clang on Linux/macOS or ClangCL on
+            Prerequisites: CMake 3.26+ · Clang on Linux/macOS or ClangCL on
             Windows · Git
           </p>
         </motion.div>
