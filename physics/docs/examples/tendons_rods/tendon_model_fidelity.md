@@ -183,7 +183,7 @@ For a straight rod of length $L$, area $A$, and Young's modulus $E$, the small-s
 
 ## Running
 
-Calling [`physics.debugger.attach()`](pathname:///generated/api/v1.0/python/api/debugger.html#superdex.physics.debugger.attach) launches or focuses the SuperDex Physics Debugger for visualization. See [Inspecting Scenes](../../debugging_scenes.md) for debugger connection, navigation, and playback controls. Execute the example from the SuperDex Physics root directory:
+Calling [`physics.debugger.attach()`](pathname:///generated/api/v1.0.0/python/api/debugger.html#superdex.physics.debugger.attach) launches or focuses the SuperDex Physics Debugger for visualization. See [Inspecting Scenes](../../debugging_scenes.md) for debugger connection, navigation, and playback controls. Execute the example from the SuperDex Physics root directory:
 
 ```bash
 cd <path_to_superdex_physics>
