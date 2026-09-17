@@ -19,14 +19,28 @@ import BrowserOnly from '@docusaurus/BrowserOnly';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import APIFrame from '@site/src/components/api_frame';
 
-// Fetches the manifest at runtime (not build time) so the page still renders
-// an empty state when versions.json does not exist yet.
-function ApiReferenceInner({ language, title }) {
+function ApiReferenceStatus({ children }) {
+  return (
+    <div className="api-reference-status" role="status">
+      {children}
+    </div>
+  );
+}
+
+function ApiReferenceFrame({ apiVersion, language, title }) {
+  return (
+    <APIFrame
+      src={`/generated/api/${apiVersion}/${language}/index.html`}
+      title={title}
+    />
+  );
+}
+
+// Resolves the mutable API artifact only for current documentation. Numbered
+// documentation snapshots pass a concrete artifact and never consult this manifest.
+function LatestApiReference({ language, title }) {
   const manifestUrl = useBaseUrl('/generated/api/versions.json');
-  // Unique per language so two API reference pages don't collide on the id.
-  const selectId = `api-version-select-${language}`;
-  const [manifest, setManifest] = useState(null);
-  const [selected, setSelected] = useState(null);
+  const [apiVersion, setApiVersion] = useState(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -37,13 +51,12 @@ function ApiReferenceInner({ language, title }) {
         if (cancelled) {
           return;
         }
-        if (data && Array.isArray(data.versions) && data.versions.length > 0) {
-          setManifest(data);
-          // Guard against a stale manifest.latest pointing at a missing dir.
-          const latest = data.versions.includes(data.latest)
-            ? data.latest
-            : data.versions[0];
-          setSelected(latest);
+        if (
+          data &&
+          Array.isArray(data.versions) &&
+          data.versions.includes(data.latest)
+        ) {
+          setApiVersion(data.latest);
         }
         setLoaded(true);
       })
@@ -64,47 +77,47 @@ function ApiReferenceInner({ language, title }) {
   }, [manifestUrl]);
 
   if (!loaded) {
-    return (
-      <div className="api-version-bar" role="status">
-        Loading API reference...
-      </div>
-    );
+    return <ApiReferenceStatus>Loading API reference...</ApiReferenceStatus>;
   }
 
-  if (!manifest || !selected) {
+  if (!apiVersion) {
     return (
-      <div className="api-version-empty" role="status">
+      <ApiReferenceStatus>
         API reference is unavailable for this version.
-      </div>
+      </ApiReferenceStatus>
     );
   }
 
   return (
-    <>
-      <div className="api-version-bar">
-        <label htmlFor={selectId}>API Version</label>
-        <select
-          id={selectId}
-          value={selected}
-          onChange={(e) => setSelected(e.target.value)}
-        >
-          {manifest.versions.map((v) => (
-            <option key={v} value={v}>
-              {v}
-              {v === manifest.latest ? ' (latest)' : ''}
-            </option>
-          ))}
-        </select>
-      </div>
-      <APIFrame
-        src={`/generated/api/${selected}/${language}/index.html`}
-        title={title}
-      />
-    </>
+    <ApiReferenceFrame
+      apiVersion={apiVersion}
+      language={language}
+      title={title}
+    />
   );
 }
 
-export default function ApiReference({ language, title }) {
+function ApiReferenceInner({ apiVersion, language, title }) {
+  if (apiVersion === 'latest') {
+    return <LatestApiReference language={language} title={title} />;
+  }
+  if (!apiVersion) {
+    return (
+      <ApiReferenceStatus>
+        API reference is unavailable for this version.
+      </ApiReferenceStatus>
+    );
+  }
+  return (
+    <ApiReferenceFrame
+      apiVersion={apiVersion}
+      language={language}
+      title={title}
+    />
+  );
+}
+
+export default function ApiReference({ apiVersion, language, title }) {
   const noticeTitleId = 'experimental-api-notice-title-' + language;
   return (
     <>
@@ -121,12 +134,16 @@ export default function ApiReference({ language, title }) {
       </div>
       <BrowserOnly
         fallback={
-          <div className="api-version-bar" role="status">
-            Loading API reference...
-          </div>
+          <ApiReferenceStatus>Loading API reference...</ApiReferenceStatus>
         }
       >
-        {() => <ApiReferenceInner language={language} title={title} />}
+        {() => (
+          <ApiReferenceInner
+            apiVersion={apiVersion}
+            language={language}
+            title={title}
+          />
+        )}
       </BrowserOnly>
     </>
   );

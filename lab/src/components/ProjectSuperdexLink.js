@@ -15,14 +15,40 @@
  */
 
 import React from 'react';
+import {useActiveVersion} from '@docusaurus/plugin-content-docs/client';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
-export default function ProjectSuperdexLink({site, children, ...props}) {
+function versionedDocsPath(path, activeVersion, release) {
+  const normalized = path.replace(/^\/+/, '');
+  if (!activeVersion || !normalized.startsWith('docs/')) {
+    return normalized;
+  }
+
+  const suffix = normalized.slice('docs/'.length);
+  if (activeVersion.name === 'current') {
+    return release ? `docs/latest/${suffix}` : normalized;
+  }
+  if (release && activeVersion.name === release.stable_version) {
+    return normalized;
+  }
+  return `docs/${activeVersion.name}/${suffix}`;
+}
+
+export default function ProjectSuperdexLink({site, path, children, ...props}) {
   const {siteConfig} = useDocusaurusContext();
-  const href = siteConfig.customFields.projectSuperdexUrls[site];
-  if (!href) {
+  const activeVersion = useActiveVersion();
+  const base = siteConfig.customFields.projectSuperdexUrls[site];
+  if (!base) {
     throw new Error(`Unknown Project SuperDex site: ${site}`);
   }
+  const href = path
+    ? base +
+      versionedDocsPath(
+        path,
+        activeVersion,
+        siteConfig.customFields.docsRelease,
+      )
+    : base;
   return (
     <a
       {...props}

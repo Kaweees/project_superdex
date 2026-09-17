@@ -5,6 +5,7 @@ hide_table_of_contents: true
 ---
 
 import styles from './index.module.css';
+import VersionedDocLink from '@site/src/components/VersionedDocLink';
 import ViewportVideo from '@site/src/components/ViewportVideo';
 
 {
@@ -110,9 +111,9 @@ import ViewportVideo from '@site/src/components/ViewportVideo';
                 poses under collision, end-effector, and trajectory constraints.
               </p>
             </div>
-            <a href="docs/overview/" className={styles.physicsLink}>
+            <VersionedDocLink docId="overview" className={styles.physicsLink}>
               Get started with SuperDex Physics →
-            </a>
+            </VersionedDocLink>
           </div>
         </div>
       </div>

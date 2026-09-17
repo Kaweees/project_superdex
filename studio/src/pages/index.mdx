@@ -6,6 +6,7 @@ hide_table_of_contents: true
 
 import styles from './index.module.css';
 import useBaseUrl from '@docusaurus/useBaseUrl';
+import VersionedDocLink from '@site/src/components/VersionedDocLink';
 import ViewportVideo from '@site/src/components/ViewportVideo';
 
 {
@@ -113,9 +114,9 @@ import ViewportVideo from '@site/src/components/ViewportVideo';
                 simulation-ready direct-from-CAD meshing.
               </p>
             </div>
-            <a href={useBaseUrl('/docs/overview/')} className={styles.layerLink}>
+            <VersionedDocLink docId="overview" className={styles.layerLink}>
               Get started with SuperDex Studio →
-            </a>
+            </VersionedDocLink>
           </div>
         </div>
       </div>

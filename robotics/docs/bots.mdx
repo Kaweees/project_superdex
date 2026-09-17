@@ -5,6 +5,7 @@ sidebar_position: 1
 ---
 
 import ProjectSuperdexLink from '@site/src/components/ProjectSuperdexLink';
+import SiteImage from '@site/src/components/SiteImage';
 
 # Bots
 
@@ -235,7 +236,7 @@ and render meshes. Abbreviated below (later joints and links elided):
 
 The FR3 arm this file describes, loaded and simulated:
 
-<img src="../../img/bots/fr3_v2.png" alt="The FR3 arm defined by fr3_v2.superdex_bot" width="420" />
+<SiteImage src="img/bots/fr3_v2.png" alt="The FR3 arm defined by fr3_v2.superdex_bot" width="420" />
 
 ## Loading a `.superdex_bot`
 
@@ -363,4 +364,4 @@ osc = bot.create_controller("BASIC_OSC_PD", "arm_osc")
 
 - [Controllers, Sensors & Actuators](./bot_components.mdx) — create and drive controllers, sensors and actuators.
 - [Modifying Bots](./modifying_bots.mdx) — compose a new bot from a base bot and other bots.
-- [Bot Assets](./bot_assets.md) — the `.superdex_bot` assets we ship.
+- [Bot Assets](./bot_assets.mdx) — the `.superdex_bot` assets we ship.

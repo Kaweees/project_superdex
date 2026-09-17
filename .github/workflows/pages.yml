@@ -41,6 +41,10 @@ jobs:
           corepack enable
           corepack prepare yarn@1.22.22 --activate
 
+      - name: Configure documentation releases
+        run: |
+          echo "SUPERDEX_DOCS_RELEASE_CONFIG=${GITHUB_WORKSPACE}/superdex/docs_release_config.js" >> "${GITHUB_ENV}"
+
       - name: Install dependencies
         run: |
           yarn --cwd superdex install --frozen-lockfile --non-interactive

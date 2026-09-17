@@ -15,6 +15,7 @@
  */
 
 import React, {useEffect, useState} from 'react';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import styles from './Figure.module.css';
 
 type Variant = 'full' | 'inset' | 'strip' | 'float';
@@ -48,6 +49,14 @@ function widthStyle(variant: Variant, maxWidth?: number) {
   return variant === 'float' ? {outer: {maxWidth}} : {inner: {maxWidth}};
 }
 
+function siteAssetPath(source: string | undefined) {
+  if (!source) return '';
+  if (/^(?:[a-z]+:|\/\/)/i.test(source)) return source;
+  return source.startsWith('/')
+    ? source
+    : `/${source.replace(/^(?:\.\.?\/)+/, '')}`;
+}
+
 export default function Figure({
   src,
   alt,
@@ -57,6 +66,7 @@ export default function Figure({
   maxHeight,
 }: FigureProps) {
   const {outer, inner} = widthStyle(variant, maxWidth);
+  const resolvedSrc = useBaseUrl(siteAssetPath(src));
   return (
     <figure className={`${styles.figure} ${styles[variant] ?? ''}`} style={outer}>
       {maxHeight ? (
@@ -64,12 +74,12 @@ export default function Figure({
         // or it would scroll away with the content it is advertising.
         <div className={styles.scrollWrap} style={inner}>
           <div className={`${styles.frame} ${styles.scroller}`} style={{maxHeight}}>
-            <img className={styles.image} src={src} alt={alt} loading="lazy" />
+            <img className={styles.image} src={resolvedSrc} alt={alt} loading="lazy" />
           </div>
         </div>
       ) : (
         <div className={styles.frame} style={inner}>
-          <img className={styles.image} src={src} alt={alt} loading="lazy" />
+          <img className={styles.image} src={resolvedSrc} alt={alt} loading="lazy" />
         </div>
       )}
       {caption && (
@@ -115,6 +125,24 @@ export function FigureLabel({children}: {children: React.ReactNode}) {
   return <span className={styles.rowLabel}>{children}</span>;
 }
 
+export function InlineImage({
+  src,
+  alt,
+  className,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+}) {
+  return (
+    <img
+      src={useBaseUrl(siteAssetPath(src))}
+      alt={alt}
+      className={className}
+    />
+  );
+}
+
 /**
  * A caption-styled footnote for an asterisked disclaimer under a figure or a
  * video, where the note qualifies the media rather than describing it. Set
@@ -136,8 +164,8 @@ export function FigureNote({
 }
 
 type FigureVideoProps = {
-  src: string;
-  poster: string;
+  src?: string;
+  poster?: string;
   alt: string;
   caption?: React.ReactNode;
   variant?: Variant;
@@ -160,6 +188,10 @@ export function FigureVideo({
   // Resolved after mount: the server render has no media query to consult, and
   // guessing wrong would ship an autoplaying video to someone who asked for none.
   const [reduceMotion, setReduceMotion] = useState(false);
+  const resolvedSrcPath = useBaseUrl(siteAssetPath(src));
+  const resolvedPosterPath = useBaseUrl(siteAssetPath(poster));
+  const resolvedSrc = src ? resolvedSrcPath : undefined;
+  const resolvedPoster = poster ? resolvedPosterPath : undefined;
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -175,8 +207,8 @@ export function FigureVideo({
       <div className={styles.frame} style={inner}>
         <video
           className={styles.video}
-          src={src}
-          poster={poster}
+          src={resolvedSrc}
+          poster={resolvedPoster}
           aria-label={alt}
           autoPlay={!reduceMotion}
           loop={!reduceMotion}
@@ -194,3 +226,4 @@ export function FigureVideo({
     </figure>
   );
 }
+

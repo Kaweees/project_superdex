@@ -16,6 +16,9 @@
 
 /* eslint-disable */
 
+const fs = require('fs');
+const path = require('path');
+
 const lightCodeTheme = {
   plain: {
     backgroundColor: '#f6f8fa',
@@ -105,6 +108,68 @@ const math = require('remark-math').default || require('remark-math');
 const katex = require('rehype-katex').default || require('rehype-katex');
 
 const isPublicBuild = process.env.SUPERDEX_PUBLIC_BUILD === '1';
+
+function readLocalDocsVersions() {
+  const versionsPath = path.join(__dirname, 'versions.json');
+  if (!fs.existsSync(versionsPath)) {
+    return [];
+  }
+  const versions = JSON.parse(fs.readFileSync(versionsPath, 'utf8'));
+  if (
+    !Array.isArray(versions) ||
+    versions.some(version => typeof version !== 'string')
+  ) {
+    throw new Error(`Invalid documentation versions file: ${versionsPath}`);
+  }
+  return versions;
+}
+
+function localDocsReleaseConfig() {
+  const availableVersions = readLocalDocsVersions();
+  const versions = {
+    current: {
+      label: availableVersions.length > 0 ? 'Latest (main)' : 'Latest',
+      path: '',
+      banner: 'none',
+      badge: false,
+    },
+  };
+  for (const version of availableVersions) {
+    versions[version] = {
+      label: `v${version}`,
+      path: version,
+      banner: 'none',
+      badge: false,
+    };
+  }
+  return {
+    release: null,
+    docsOptions: {
+      includeCurrentVersion: true,
+      lastVersion: 'current',
+      ...(availableVersions.length === 0
+        ? {onlyIncludeVersions: ['current']}
+        : {}),
+      versions,
+    },
+    navbarItems:
+      availableVersions.length > 0
+        ? [{type: 'docsVersionDropdown', position: 'left'}]
+        : [],
+  };
+}
+
+const docsReleaseConfigPath = process.env.SUPERDEX_DOCS_RELEASE_CONFIG;
+if (isPublicBuild && !docsReleaseConfigPath) {
+  throw new Error(
+    'SUPERDEX_DOCS_RELEASE_CONFIG is required for a public documentation build.',
+  );
+}
+const docsReleaseConfig = docsReleaseConfigPath
+  ? require(docsReleaseConfigPath).loadDocsReleaseConfig({
+      siteDir: __dirname,
+    })
+  : localDocsReleaseConfig();
 const googleTagId = (process.env.SUPERDEX_GOOGLE_TAG_ID || '').trim();
 const publicOrigin = (
   process.env.SUPERDEX_PUBLIC_ORIGIN || 'https://projectsuperdex.com'
@@ -151,6 +216,12 @@ const projectSuperdexUrl = projectSuperdexUrls.landing;
   organizationName: 'facebook',
   // Must match the ShipIt/staticdocs registration key below.
   projectName: 'SuperDexPhysics',
+  future: {
+    experimental_storage: {
+      type: 'localStorage',
+      namespace: 'project-superdex-docs',
+    },
+  },
   markdown: {
     format: 'detect',
     hooks: {
@@ -165,6 +236,7 @@ const projectSuperdexUrl = projectSuperdexUrls.landing;
     ossRepoPath: '.',
     projectSuperdexUrl,
     projectSuperdexUrls,
+    docsRelease: docsReleaseConfig.release,
   },
 
   presets: [
@@ -174,6 +246,7 @@ const projectSuperdexUrl = projectSuperdexUrls.landing;
       ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
+          ...docsReleaseConfig.docsOptions,
           remarkPlugins: [math],
           rehypePlugins: [katex],
         },
@@ -199,6 +272,9 @@ const projectSuperdexUrl = projectSuperdexUrls.landing;
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      docs: {
+        versionPersistence: 'localStorage',
+      },
       colorMode: {
         defaultMode: 'light',
         disableSwitch: false,
@@ -207,6 +283,7 @@ const projectSuperdexUrl = projectSuperdexUrls.landing;
       navbar: {
         title: 'SuperDex Physics',
         items: [
+          ...docsReleaseConfig.navbarItems,
           {
             type: 'docSidebar',
             sidebarId: 'docsSidebar',

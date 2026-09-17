@@ -17,13 +17,14 @@
 import React from 'react';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import VersionedDocLink from '@site/src/components/VersionedDocLink';
 import styles from './styles.module.css';
 
 // Links map to this site's own tabs (validated against the live navbar routes).
 const QUICK_LINKS = [
-  {label: 'Docs', to: '/docs/overview/'},
-  {label: 'Examples', to: '/docs/examples/getting_started/'},
-  {label: 'API Reference', to: '/docs/api_reference/cpp/'},
+  {label: 'Docs', docId: 'overview'},
+  {label: 'Examples', docId: 'examples/getting_started'},
+  {label: 'API Reference', docId: 'api_reference/cpp'},
 ];
 
 const EXPLORE_LINKS = [
@@ -76,9 +77,12 @@ export default function Footer() {
           <div className={styles.linkCol}>
             <p className={styles.colTitle}>Quick Links</p>
             {QUICK_LINKS.map((l) => (
-              <Link key={l.label} to={l.to} className={styles.link}>
+              <VersionedDocLink
+                key={l.label}
+                docId={l.docId}
+                className={styles.link}>
                 {l.label}
-              </Link>
+              </VersionedDocLink>
             ))}
           </div>
 

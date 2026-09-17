@@ -9,10 +9,26 @@ them into complete simulation configs.
 
 ## Quick start
 
+For most documentation changes, preview only this site. This is the fast path
+and supports hot reloading:
+
 ```bash
-yarn install
+yarn install  # Only when dependencies are not already installed
 yarn start
 # → http://localhost:3000/
+```
+
+The single-site preview defaults to `Latest`; when documentation snapshots are
+present, use the version selector to preview them. Run `yarn build` when you
+need to validate that this site compiles successfully for production.
+
+Use the whole-site helper only when validation requires the Project SuperDex
+homepage and all configured nested sites together, such as testing public base
+paths, release routing, or cross-site links. It stages and builds every site and
+can take several minutes. Run it from the fbsource root:
+
+```bash
+buck2 run fbsource//arvr/projects/superdex/ci:preview_website
 ```
 
 ## Structure

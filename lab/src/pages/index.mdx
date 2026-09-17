@@ -7,6 +7,7 @@ hide_table_of_contents: true
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import React, {useState} from 'react';
 import styles from './index.module.css';
+import VersionedDocLink from '@site/src/components/VersionedDocLink';
 import ViewportVideo from '@site/src/components/ViewportVideo';
 
 export const timedOverlayLabels = [
@@ -114,9 +115,9 @@ export function SimToRealMedia() {
                 the Gym environments.
               </p>
             </div>
-            <a href={useBaseUrl('/docs/overview/')} className={styles.layerLink}>
+            <VersionedDocLink docId="overview" className={styles.layerLink}>
               Get started with SuperDex Lab →
-            </a>
+            </VersionedDocLink>
           </div>
         </div>
       </div>

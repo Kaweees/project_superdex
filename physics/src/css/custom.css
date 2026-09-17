@@ -771,31 +771,8 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
   margin: 0;
 }
 
-/* API reference version selector bar */
-.api-version-bar {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.api-version-bar label {
-  font-weight: 500;
-  color: var(--ifm-font-color-base);
-}
-
-.api-version-bar select {
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--ifm-global-radius);
-  border: 1px solid var(--ifm-toc-border-color);
-  background-color: var(--ifm-background-surface-color);
-  color: var(--ifm-font-color-base);
-  font-family: var(--ifm-font-family-base);
-}
-
-/* Shown when the version manifest is missing or empty (e.g. docs not yet built) */
-.api-version-empty {
+/* Shown while the API manifest loads or when its latest artifact is unavailable. */
+.api-reference-status {
   padding: 1rem;
   color: var(--ifm-font-color-secondary);
 }

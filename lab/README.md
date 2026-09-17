@@ -9,34 +9,31 @@ system-ID.
 
 ## Quick start
 
+For most documentation changes, preview only this site. This is the fast path
+and supports hot reloading:
+
 ```bash
-yarn install
+yarn install  # Only when dependencies are not already installed
 yarn start
 # → http://localhost:3000/
 ```
 
-Set `SUPERDEX_PUBLIC_BUILD=1` to switch the site off its internal URLs; without
-it, canonical URLs and cross-site links resolve only inside Meta.
+The single-site preview defaults to `Latest`; when documentation snapshots are
+present, use the version selector to preview them.
 
-The flag changes URL wiring only, so a local run previews that wiring rather
-than the published site: the deploy workflow (`.github/workflows/pages.yml`)
-also sets `SUPERDEX_PUBLIC_ORIGIN` and `SUPERDEX_PUBLIC_BASE_URL`, which locally
-default to `https://projectsuperdex.com` and `/`, and the published site is
-built from the exported tree rather than from this one.
-
-Use it with `yarn start`, not `yarn build`. A public **build** refuses to run
-while `docs/internal/` is present, because the site's preset copies `docs/`
-verbatim into `build/_src/` and would publish the internal pages; the published
-site is built from the exported tree, where ShipIt has already removed them.
+Run the whole-site helper only when validation requires the Project SuperDex
+homepage and all configured nested sites together, such as testing public base
+paths, release routing, cross-site links, or the exported Lab site without
+`docs/internal/`. It can take several minutes. Run it from the fbsource root:
 
 ```bash
-# macOS / Linux
-SUPERDEX_PUBLIC_BUILD=1 yarn start
-# → http://localhost:3000/lab/   (the flag moves baseUrl to /lab/)
-
-# Windows PowerShell
-$env:SUPERDEX_PUBLIC_BUILD = '1'; yarn start
+buck2 run fbsource//arvr/projects/superdex/ci:preview_website
 ```
+
+The helper stages public copies outside fbsource, omits `docs/internal/`, builds
+every site, and serves the assembled website. Public Docusaurus builds fail
+unless this helper or the deployment workflow supplies the central release
+configuration.
 
 ## Structure
 

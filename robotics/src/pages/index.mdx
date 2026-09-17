@@ -7,6 +7,7 @@ hide_table_of_contents: true
 import styles from './index.module.css';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import ProjectSuperdexLink from '@site/src/components/ProjectSuperdexLink';
+import VersionedDocLink from '@site/src/components/VersionedDocLink';
 import ViewportVideo from '@site/src/components/ViewportVideo';
 
 {
@@ -101,9 +102,9 @@ import ViewportVideo from '@site/src/components/ViewportVideo';
                 operational-space and joint-space PD controllers to drive robots.
               </p>
             </div>
-            <a href={useBaseUrl('/docs/overview/')} className={styles.layerLink}>
+            <VersionedDocLink docId="overview" className={styles.layerLink}>
               Get started with SuperDex Robotics →
-            </a>
+            </VersionedDocLink>
           </div>
         </div>
       </div>

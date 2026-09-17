@@ -5,7 +5,7 @@ sidebar_position: 2
 description: 'A map of the SuperDex Studio window: the menu and tab bar, viewport camera and gizmos, Asset Browser, Log Console, hierarchy and details panels, and the app-wide layout and shortcuts.'
 ---
 
-import Figure, {FigureRow, FigureLabel, FigureVideo} from '@site/src/components/Figure';
+import Figure, {FigureRow, FigureLabel, FigureVideo, InlineImage} from '@site/src/components/Figure';
 
 # User Interface
 
@@ -102,10 +102,10 @@ of the Viewport.
 | Snap to a view | Shortcut | On-screen |
 |----------------|----------|-----------|
 | Center to object | `F`, or `Numpad .` | — |
-| Home view | `Home` | <img src="../../img/user_interface/icon_home.webp" alt="The home button" className="sdx-inline-icon sdx-inline-icon--round" /> |
-| Axis-aligned views | `Numpad 1` front, `3` right, `7` top. Add `Ctrl` for the opposite face | <img src="../../img/user_interface/icon_axes.webp" alt="The coordinate system" className="sdx-inline-icon" /> |
+| Home view | `Home` | <InlineImage src="../../img/user_interface/icon_home.webp" alt="The home button" className="sdx-inline-icon sdx-inline-icon--round" /> |
+| Axis-aligned views | `Numpad 1` front, `3` right, `7` top. Add `Ctrl` for the opposite face | <InlineImage src="../../img/user_interface/icon_axes.webp" alt="The coordinate system" className="sdx-inline-icon" /> |
 | Flip to the opposite side | `Numpad 9` | — |
-| Perspective / orthographic | `Numpad 5` | <img src="../../img/user_interface/icon_projection.webp" alt="The camera button" className="sdx-inline-icon sdx-inline-icon--round" /> |
+| Perspective / orthographic | `Numpad 5` | <InlineImage src="../../img/user_interface/icon_projection.webp" alt="The camera button" className="sdx-inline-icon sdx-inline-icon--round" /> |
 
 Snapping re-frames as well as rotates: the camera centers on whatever is
 selected, or on the whole scene if nothing is.
@@ -425,3 +425,4 @@ editing disabled.
 - [Bot Editor Guide](./bot_editor/index.mdx) — articulation, contacts, and Mod Bots.
 - [Prefab Editor Guide](./prefab_editor.mdx) — composing actors into a prefab.
 - [Model Editor Guide](./model_editor.mdx) — the modifier stack that builds collision geometry.
+

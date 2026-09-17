@@ -17,12 +17,13 @@
 import React from 'react';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import VersionedDocLink from '@site/src/components/VersionedDocLink';
 import styles from './styles.module.css';
 
 // Links map to this site's own tabs.
 const QUICK_LINKS = [
-  {label: 'Docs', to: '/docs/overview/'},
-  {label: 'SuperDex Gym', to: '/docs/superdex_gym/intro/'},
+  {label: 'Docs', docId: 'overview'},
+  {label: 'SuperDex Gym', docId: 'superdex_gym/intro'},
 ];
 
 const EXPLORE_LINKS = [
@@ -76,9 +77,12 @@ export default function Footer() {
           <div className={styles.linkCol}>
             <p className={styles.colTitle}>Quick Links</p>
             {QUICK_LINKS.map((l) => (
-              <Link key={l.label} to={l.to} className={styles.link}>
+              <VersionedDocLink
+                key={l.label}
+                docId={l.docId}
+                className={styles.link}>
                 {l.label}
-              </Link>
+              </VersionedDocLink>
             ))}
           </div>
 

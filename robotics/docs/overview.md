@@ -40,7 +40,7 @@ Look for these in upcoming releases.
 
 Explore our documentation to begin building with SuperDex Robotics:
 
-- **[Getting Started](./getting_started.md)** - Set up and build SuperDex Robotics on your platform
+- **[Getting Started](./getting_started.mdx)** - Set up and build SuperDex Robotics on your platform
 - **[C++ API Reference](./api_reference/cpp.mdx)** - Complete C++ API documentation
 - **[Python API Reference](./api_reference/python.mdx)** - Complete Python API documentation
 - **[Examples](./examples/overview.mdx)** - Walk through the shipped Python examples end to end
@@ -49,9 +49,9 @@ Explore our documentation to begin building with SuperDex Robotics:
 
 | Guide | What it covers |
 |-------|----------------|
-| [Getting Started](./getting_started.md) | Installing SuperDex and building it from source. |
+| [Getting Started](./getting_started.mdx) | Installing SuperDex and building it from source. |
 | [Bots](./bots.mdx) | The `BotPrefab` schema and the `.superdex_bot` file format. |
 | [Modifying Bots](./modifying_bots.mdx) | Composing bots from a base with `ModBotPrefab` modification recipes. |
 | [Bot Context & Lifetime](./bot_context_lifetime.mdx) | How `RoboticsContext` owns bot and controller memory. |
 | [Controllers, Sensors & Actuators](./bot_components.mdx) | Creating, driving and writing the three component kinds. |
-| [Bot Assets](./bot_assets.md) | The bots we ship in the `assets/bots` folder. |
+| [Bot Assets](./bot_assets.mdx) | The bots we ship in the `assets/bots` folder. |

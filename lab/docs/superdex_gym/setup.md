@@ -13,7 +13,7 @@ Ray/RLlib is an optional training-stack dependency for `apps/rllib` and is insta
 separately.
 
 Before installing, follow the
-[Project SuperDex build instructions](https://github.com/facebookresearch/project_superdex#building-from-source)
+[Project SuperDex build instructions](https://github.com/facebookresearch/project_superdex/blob/main/README.md#building-from-source)
 to set up the required toolchain. Use the `project_superdex` root as your working
 directory.
 

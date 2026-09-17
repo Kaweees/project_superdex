@@ -2,19 +2,42 @@
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 import React, { useRef, useState } from "react";
+import useBaseUrl from "@docusaurus/useBaseUrl";
 
 type Props = {
-  src: string;
-  poster: string;
+  src?: string;
+  poster?: string;
   alt?: string;
 };
+
+function siteAssetPath(source: string | undefined) {
+  if (!source) return "";
+  if (/^(?:[a-z]+:|\/\/)/i.test(source)) return source;
+  return source.startsWith("/")
+    ? source
+    : `/${source.replace(/^(?:\.\.?\/)+/, "")}`;
+}
 
 export default function FeatureVideo({ src, poster, alt }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const resolvedSrcPath = useBaseUrl(siteAssetPath(src));
+  const resolvedPosterPath = useBaseUrl(siteAssetPath(poster));
+  const resolvedSrc = src ? resolvedSrcPath : undefined;
+  const resolvedPoster = poster ? resolvedPosterPath : undefined;
 
   const handlePlay = () => {
     const v = videoRef.current;
@@ -43,7 +66,7 @@ export default function FeatureVideo({ src, poster, alt }: Props) {
         controls
         playsInline
         preload="metadata"
-        poster={poster}
+        poster={resolvedPoster}
         aria-label={alt}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
@@ -56,7 +79,7 @@ export default function FeatureVideo({ src, poster, alt }: Props) {
           background: "#000",
         }}
       >
-        <source src={src} type="video/mp4" />
+        <source src={resolvedSrc} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
@@ -98,3 +121,4 @@ export default function FeatureVideo({ src, poster, alt }: Props) {
     </div>
   );
 }
+
