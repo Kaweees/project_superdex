@@ -673,3 +673,15 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
   border-top: 1px solid var(--sdx-divider);
   margin: 0;
 }
+
+/* Environment gallery: uniform two-column cards with each GIF scaled to fit
+   the card while preserving aspect ratio. */
+.env-card {
+  height: 100%;
+}
+.env-card img {
+  display: block;
+  width: 100%;
+  height: 240px;
+  object-fit: contain;
+}

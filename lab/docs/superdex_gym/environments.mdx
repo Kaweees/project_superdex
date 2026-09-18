@@ -184,22 +184,32 @@ class MyCustomEnv(MochiEnv):
             self._terminated = True
 ```
 
-### 3. Discover and run the environment
+### 3. Register and run the environment
 
-Save the module as `my_custom_env.py` inside
-`superdex.lab.gym.envs.benchmarks`, `superdex.lab.gym.envs.robots`, or one of their
-subpackages. The filename, concrete `MyCustomEnv` class, and sibling
-`MyCustomEnvCfg` class satisfy discovery without editing a registry file.
-External packages are not scanned automatically; register their environment classes
-explicitly with `gym.register(...)`.
+Environments are registered **explicitly** -- there is no filesystem scanning. Declare an
+`EnvSpec` and register it before calling `gym.make`. Every spec shares the same
+`entry_point` -- the `make_superdex_env` factory -- and names the concrete class in
+`kwargs["env_cls"]` (`"<module>:<ClassName>"`); the canonical `id` lives in the
+`superdex_gym` namespace and ends in `-vN`, and the per-env configuration is
+`kwargs["cfg"]`:
 
 ```python
 import gymnasium as gym
+from gymnasium.envs.registration import EnvSpec
 from gymnasium.utils.env_checker import check_env
 
-from superdex.lab.gym.utils.env_discovery import register_all_envs
+from superdex.lab.gym.registration import register_env_spec
 
-register_all_envs()
+register_env_spec(
+    EnvSpec(
+        id="superdex_gym/MyCustom-v0",
+        entry_point="superdex.lab.gym.registration:make_superdex_env",
+        kwargs={
+            "env_cls": "my_package.my_custom_env:MyCustomEnv",
+            "cfg": {},
+        },
+    )
+)
 env = gym.make("superdex_gym/MyCustom-v0")
 try:
     # Raises if the environment violates the Gymnasium API.
@@ -321,106 +331,111 @@ noise is Gaussian and is not clipped. Both use the generator seeded by
 be destroyed before their scene.
 :::
 
-## Discovery and Registration
+## Registration
 
-Environments are discovered by scanning the configured packages for modules named
-`*_env.py`, so there is no per-environment registry to edit.
+Environments are registered **explicitly** -- SuperDex does not scan the filesystem for
+`*_env.py` modules. The shipped public environments are declared as a list of `EnvSpec`s
+in `superdex.lab.gym.registration` and registered by `register_envs()`; importing
+`superdex.lab.gym` calls that for you. (Internal environments are declared in
+`superdex.lab.gym.internal.registration` and registered by `register_internal_envs()`.)
 
-### Making an environment discoverable
+### Registering an environment
 
-Five conditions must all hold:
-
-1. The module is named `*_env.py`.
-2. It lives inside a scanned package — `superdex.lab.gym.envs.benchmarks`,
-   `superdex.lab.gym.envs.robots`, or any subpackage of them, since the roots are
-   scanned recursively.
-3. The class is a concrete, non-abstract `MochiEnv` subclass.
-4. Its name ends in `Env`.
-5. A sibling config class named `<ClassName>Cfg` exists in the same module.
-
-An abstract subclass that has not implemented all three required methods is skipped.
-A missing sibling config emits a warning; import and malformed-configuration errors
-are reported.
-
-Note also that the class must be **defined** in that module — imported base classes
-re-exported into scope are ignored.
-
-### Names derived from the class
-
-| Class | Gymnasium ID | CLI short name |
-| --- | --- | --- |
-| `CartPoleEnv` | `superdex_gym/CartPole-v0` | `cart_pole` |
-| `HalfCheetahEnv` | `superdex_gym/HalfCheetah-v0` | `half_cheetah` |
-| `MyCustomEnv` | `superdex_gym/MyCustom-v0` | `my_custom` |
-
-The `Env` suffix is stripped, the Gymnasium ID retains PascalCase, and the CLI name is
-the snake_case conversion. The module filename does **not** determine either — hence
-`cartpole_env.py` producing `cart_pole`.
-
-### Registering with Gymnasium
-
-:::caution `gym.make` fails until `register_all_envs()` has run
-Discovery populates an internal list; registration is a separate, explicit step.
+Declare a spec, register it, then `gym.make` its canonical ID:
 
 ```python
 import gymnasium as gym
-from superdex.lab.gym.utils.env_discovery import register_all_envs
+from gymnasium.envs.registration import EnvSpec
+from superdex.lab.gym.registration import register_env_spec
 
-register_all_envs()
-env = gym.make("superdex_gym/CartPole-v0")
+register_env_spec(
+    EnvSpec(
+        id="superdex_gym/MyCustom-v0",
+        entry_point="superdex.lab.gym.registration:make_superdex_env",
+        kwargs={
+            "env_cls": "my_package.my_custom_env:MyCustomEnv",
+            "cfg": {},
+        },
+    )
+)
+env = gym.make("superdex_gym/MyCustom-v0", cfg={"use_gravity": False})
 ```
 
-`register_all_envs()` is idempotent for equivalent specs — a Gymnasium ID already in
-the registry with a matching spec is left alone, while an incompatible existing
-registration raises `ValueError`.
-:::
+Each spec carries:
 
-Pass configuration through `cfg`:
+- **`id`** -- the canonical Gymnasium ID in the `superdex_gym` namespace, ending in `-vN`.
+  This is exactly what `gym.make` and the CLI accept; there are no short names or
+  discovery aliases.
+- **`entry_point`** -- always the shared `make_superdex_env` factory
+  (`"superdex.lab.gym.registration:make_superdex_env"`), which loads `env_cls` and merges
+  any `gym.make` keyword overrides into `cfg`.
+- **`kwargs["env_cls"]`** -- `"<module>:<ClassName>"` for the concrete `MochiEnv` subclass.
+- **`kwargs["cfg"]`** -- the registered configuration. Overrides passed to
+  `gym.make(id, cfg={...})` are deep-merged over this registered `cfg`.
+
+`register_env_spec` registers the spec; `get_env_specs()` simply scans the Gymnasium
+registry for the `superdex_gym` namespace, so any spec registered this way appears in the
+catalog helpers (there is no separate "recording" step). Registration is idempotent for an
+equivalent spec -- a matching ID already in the registry is left alone, while an
+incompatible existing registration raises `ValueError`.
+
+### Names are canonical IDs
+
+| Class | Canonical Gymnasium ID |
+| --- | --- |
+| `CartPoleEnv` | `superdex_gym/CartPole-v0` |
+| `HalfCheetahEnv` | `superdex_gym/HalfCheetah-v0` |
+| `MyCustomEnv` | `superdex_gym/MyCustom-v0` |
+
+The `id` is chosen when you declare the spec, not derived from the module or class name.
+By convention it drops the `Env` suffix and keeps PascalCase. The canonical ID is the
+only public name -- `gym.make` and the CLI accept it directly, with no short-name aliases.
+
+### Listing registered environments
 
 ```python
-env = gym.make("superdex_gym/CartPole-v0", cfg={"use_gravity": False})
+from superdex.lab.gym.registration import get_env_specs, register_envs
+
+register_envs()
+for spec in get_env_specs():
+    print(spec.id)
 ```
 
-To list what your build found:
+### Config variants are additional specs
+
+A configuration variant is simply **another `EnvSpec`** that reuses the same
+`env_cls` with a different registered `cfg` and its own canonical ID -- not a separate
+JSON file or a discovered artifact. The shipped CartPole, for example, declares a base
+and a variant:
 
 ```python
-from superdex.lab.gym.utils.env_discovery import get_env_short_names
-
-for short_name, entry in sorted(get_env_short_names().items()):
-    print(f"{short_name:24} {entry.env_id}")
+EnvSpec(
+    id="superdex_gym/CartPole-v0",
+    entry_point="superdex.lab.gym.registration:make_superdex_env",
+    kwargs={
+        "env_cls": "superdex.lab.gym.envs.benchmarks.cartpole_env:CartPoleEnv",
+        "cfg": {},
+    },
+)
+EnvSpec(
+    id="superdex_gym/CartPoleActuateOnPole-v0",
+    entry_point="superdex.lab.gym.registration:make_superdex_env",
+    kwargs={
+        "env_cls": "superdex.lab.gym.envs.benchmarks.cartpole_env:CartPoleEnv",
+        "cfg": {"actuate_on_pole": True},
+    },
+)
 ```
 
-### Config variants
+Every trainable configuration is its own registered canonical ID, which is what lets the
+RLlib recipes below map one-to-one to environments.
 
-A JSON file whose name extends the module filename defines an **additional**
-Gymnasium environment using the same class:
+### Test-only environments
 
-```
-cartpole_env.py
-cartpole_env_no_gravity.json    ->  superdex_gym/CartPoleNoGravity-v0
-                                    CLI: cart_pole_no_gravity
-```
-
-```json
-{
-  "description": "CartPole with gravity disabled.",
-  "env_cfg": {"use_gravity": false}
-}
-```
-
-The variant name is the part after `<module>_`, and three rules apply to its
-underscore-separated segments:
-
-- It must be snake_case. The Gymnasium ID is built by capitalizing each segment, so
-  `cartpole_env_nogravity.json` yields `CartPoleNogravity-v0`, not `CartPoleNoGravity-v0`.
-- `env`, `train` and `benchmark` are reserved segments. A file using one is silently
-  ignored (a debug log line only), keeping longer sibling modules and reserved usage
-  categories unambiguous.
-- A `test` segment (`cartpole_env_test_damped_free_pole.json`) marks the variant
-  **test-only**: it is discovered and exercised by the generated smoke tests, but
-  `register_all_envs()` skips it and `get_env_short_names()` hides it, so it never
-  appears as a Gymnasium ID or a CLI name. Test-only variants are degenerate
-  configurations worth crash-checking but not shippable tasks.
+Environments that exist only to be crash-checked -- degenerate configurations not worth
+shipping as tasks -- are **not** registered at import time. Register them from within the
+tests that exercise them, so they never enter the shipped registry or the catalog
+helpers.
 
 ### RLlib recipes use explicit manifests
 

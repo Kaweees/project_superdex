@@ -174,21 +174,30 @@ const docsReleaseConfig = docsReleaseConfigPath
 const googleTagId = (process.env.SUPERDEX_GOOGLE_TAG_ID || '').trim();
 
 // A public build must run from the OSS export, where ShipIt has already stripped
-// docs/internal/. If that directory is present the export has not happened, so
-// refuse rather than emit internal pages: the internaldocs preset copies docs/
-// verbatim to build/_src/ and no docs `exclude` can stop that copy. Only `build`
-// and `deploy` emit output; `start` is exempt so the README's public-URL preview
-// still works.
+// every internal/ directory. Only `build` and `deploy` emit output; `start` is
+// exempt so the README's public-URL preview still works.
 if (
   isPublicBuild &&
-  (docusaurusSubcommand === 'build' || docusaurusSubcommand === 'deploy') &&
-  fs.existsSync(path.join(__dirname, 'docs', 'internal'))
+  (docusaurusSubcommand === 'build' || docusaurusSubcommand === 'deploy')
 ) {
-  throw new Error(
-    'SUPERDEX_PUBLIC_BUILD=1 but docs/internal/ exists. A public build must run ' +
-      'from the exported tree; building here would publish internal pages and ' +
-      'their raw markdown under _src/internal/.',
-  );
+  // ShipIt strips any `internal/` directory on export (see ci/project_superdex.cconf:
+  // `@(^|.*/)internal/.*@`). If one is still present, the build is running against an
+  // un-exported tree and would publish internal content: pages under docs/internal/ (and
+  // their raw markdown under _src/internal/), or internal environment renders under
+  // static/img/internal/. The internaldocs preset copies docs/ and static/ verbatim, so
+  // no docs `exclude` can stop that copy -- refuse instead.
+  const forbidden = [
+    path.join(__dirname, 'docs', 'internal'),
+    path.join(__dirname, 'static', 'img', 'internal'),
+  ].filter((dir) => fs.existsSync(dir));
+  if (forbidden.length > 0) {
+    throw new Error(
+      'SUPERDEX_PUBLIC_BUILD=1 but internal-only directories are present: ' +
+        forbidden.join(', ') +
+        '. A public build must run from the exported tree; building here would ' +
+        'publish internal pages and/or internal environment renders.',
+    );
+  }
 }
 const publicOrigin = (
   process.env.SUPERDEX_PUBLIC_ORIGIN || 'https://projectsuperdex.com'

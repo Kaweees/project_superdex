@@ -5,7 +5,7 @@ title: Environment Class API
 # Environment Class API
 
 Use this page for the shared runtime API implemented by `MochiEnv`. For the
-shipped environment contracts, see [Examples](./examples.mdx).
+shipped environment contracts, see the [Gallery of Environments](./envs/overview.mdx).
 
 ## Runtime API
 
@@ -113,11 +113,12 @@ with CartPoleEnv(CartPoleEnvCfg()) as env:
     print({k: v for k, v in info.items() if k.startswith("reward_")})
 ```
 
-List every environment available to the CLI in this installation:
+List every SuperDex environment registered in this installation -- these canonical IDs are exactly what the CLI accepts:
 
 ```python
-from superdex.lab.gym.utils.env_discovery import get_env_short_names
+from superdex.lab.gym.registration import get_env_specs, register_envs
 
-for short_name, entry in sorted(get_env_short_names().items()):
-    print(f"{short_name:24} {entry.env_id:40} {entry.env_cls.__name__}")
+register_envs()  # idempotent; registers the public SuperDex specs with Gymnasium
+for spec in sorted(get_env_specs(), key=lambda spec: spec.id):
+    print(spec.id)
 ```

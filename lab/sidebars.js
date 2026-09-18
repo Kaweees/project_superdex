@@ -20,6 +20,29 @@ const fs = require('fs');
 const path = require('path');
 
 /**
+ * The generated env pages live under `dirName` alongside an `overview.mdx` gallery page
+ * and an `_env_sidebar.json` list of env doc ids, both written by apps/docs/gen_mds.py.
+ * This builds a category that links to `overview` and lists those env pages, from which
+ * Docusaurus derives previous/next pagination. Only reference it when the list exists, so
+ * a checkout that has not run gen_mds still builds (naming a doc id with no backing file
+ * fails checkSidebarsDocIds).
+ */
+function generatedEnvsCategory(dirName) {
+  const listPath = path.join(__dirname, 'docs', dirName, '_env_sidebar.json');
+  if (!fs.existsSync(listPath)) {
+    return [];
+  }
+  return [
+    {
+      type: 'category',
+      label: 'Gallery of Environments',
+      link: {type: 'doc', id: `${dirName}/overview`},
+      items: JSON.parse(fs.readFileSync(listPath, 'utf8')),
+    },
+  ];
+}
+
+/**
  * Only add this category when its directory exists: naming a doc id with no
  * backing file fails checkSidebarsDocIds. Guarding on the directory rather than
  * on the page keeps a renamed or retitled page failing loudly. A doc id defaults
@@ -45,6 +68,7 @@ function internalCategoryItems() {
           label: 'SuperDex Gym (internal)',
           items: [
             'internal/superdex_gym/internal_environments',
+            ...generatedEnvsCategory('internal/superdex_gym/envs'),
             'internal/superdex_gym/setup_meta',
             'internal/superdex_gym/benchmarking_meta',
           ],
@@ -79,7 +103,7 @@ module.exports = {
         'superdex_gym/intro',
         'superdex_gym/setup',
         'superdex_gym/running_examples',
-        'superdex_gym/examples',
+        ...generatedEnvsCategory('superdex_gym/envs'),
         'superdex_gym/env_reference',
         'superdex_gym/benchmarking',
         'superdex_gym/environments',
