@@ -137,7 +137,7 @@ For simplicity, this example does not adjust step size dynamically to synchroniz
 ## Running
 
 ```bash
-uv run --no-project examples/example_tshirt_on_plane.py
+uv run examples/example_tshirt_on_plane.py
 ```
 
 This example launches or focuses the SuperDex Physics Debugger and runs while it remains connected. See [Inspecting Scenes](../../debugging_scenes.md) for connection, navigation, and playback controls.

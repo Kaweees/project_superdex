@@ -39,7 +39,7 @@ Examples can be run with `uv`:
 
 ```bash
 cd <path_to_superdex_physics>
-uv run --no-project examples/example_rigid_bodies.py
+uv run examples/example_rigid_bodies.py
 ```
 
 Most examples automatically launch the SuperDex Physics Debugger for inspecting and controlling the simulated scene. See [Inspecting Scenes](../debugging_scenes.md) for navigation and playback controls.

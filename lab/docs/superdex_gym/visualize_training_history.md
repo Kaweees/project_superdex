@@ -19,7 +19,7 @@ Checkpoint videos are off by default. Pass `--video_on_checkpoint` to
 
 ```bash
 cd superdex_lab/apps/rllib
-uv run --no-project python train_samples.py \
+uv run python train_samples.py \
   --pattern "cart_pole" --checkpoint_freq 2 --video_on_checkpoint
 ```
 

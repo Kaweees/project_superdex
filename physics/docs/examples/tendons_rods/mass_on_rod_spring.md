@@ -167,7 +167,7 @@ The simulation steps at a fixed 60 Hz. This is feasible in spite of the high rod
 ## Running
 
 ```bash
-uv run --no-project examples/example_mass_on_rod_spring.py
+uv run examples/example_mass_on_rod_spring.py
 ```
 
 This example launches or focuses the SuperDex Physics Debugger and runs while it remains connected. See [Inspecting Scenes](../../debugging_scenes.md) for connection, navigation, and playback controls.

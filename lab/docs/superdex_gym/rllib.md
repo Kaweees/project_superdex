@@ -28,8 +28,10 @@ uv pip install torch==2.7.1 --extra-index-url https://download.pytorch.org/whl/c
 uv pip install "ray[rllib]==2.49.0" "moviepy" "pillow>=10.1" "tensorboard"
 ```
 
-Run training commands below with `uv run --no-project`. Inference and visualization
-use plain `uv run`. See
+After installing the dependencies above, run the commands below from
+`superdex_lab/apps/rllib` with plain `uv run`. Because `superdex_lab` is an
+unmanaged uv project, `uv run` reuses the existing environment without synchronizing
+dependencies or replacing installed packages with local source builds. See
 [Dependencies for apps](./setup.md#dependencies-for-apps).
 
 ### Working directory
@@ -53,7 +55,7 @@ imports and runs from any directory.
 Run one CartPole PPO iteration with one environment runner:
 
 ```bash
-uv run --no-project python train_samples.py \
+uv run python train_samples.py \
   --pattern "cart_pole" --num_env_runners 1 --max_iterations 1
 ```
 
@@ -158,24 +160,24 @@ All three recipes use assets included in the checkout.
 
 ```bash
 # Train all trainable environments with PPO (default).
-uv run --no-project python train_samples.py
+uv run python train_samples.py
 
 # Train specific environments using patterns.
-uv run --no-project python train_samples.py --pattern "cart_pole"
-uv run --no-project python train_samples.py --pattern "*cheetah*"
+uv run python train_samples.py --pattern "cart_pole"
+uv run python train_samples.py --pattern "*cheetah*"
 
 # Train with a custom configuration.
-uv run --no-project python train_samples.py --num_env_runners 64 --checkpoint_freq 5
+uv run python train_samples.py --num_env_runners 64 --checkpoint_freq 5
 
 # Experimental SAC run on CartPole, limited to one training iteration.
 # This checks the training path, not learning or convergence.
-uv run --no-project python train_samples.py --algorithm SAC --pattern "cart_pole" --max_iterations 1
+uv run python train_samples.py --algorithm SAC --pattern "cart_pole" --max_iterations 1
 
 # Train selected environments with video recording enabled (off by default)
-uv run --no-project python train_samples.py --pattern "ant*" --video_on_checkpoint --output_path ./benchmark_results
+uv run python train_samples.py --pattern "ant*" --video_on_checkpoint --output_path ./benchmark_results
 
 # High-throughput training for benchmarking
-uv run --no-project python train_samples.py --num_env_runners 128 --checkpoint_freq 20
+uv run python train_samples.py --num_env_runners 128 --checkpoint_freq 20
 ```
 
 :::caution `--pattern` matches CLI short names

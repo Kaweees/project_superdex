@@ -59,7 +59,7 @@ The duck starts high above the plane and rotated onto its side, so that it impac
 ## Running
 
 ```bash
-uv run --no-project examples/example_state_capture_restore.py
+uv run examples/example_state_capture_restore.py
 ```
 
 `debugger.attach()` launches or focuses the Debugger and waits for it to connect. The scene starts paused; press **Play** in the Debugger to advance the simulation. Detaching the Debugger ends the simulation loop. See [Inspecting Scenes](../../debugging_scenes.md) for debugger connection, navigation, and playback controls.

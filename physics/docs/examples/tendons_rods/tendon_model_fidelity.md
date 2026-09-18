@@ -187,7 +187,7 @@ Calling [`physics.debugger.attach()`](pathname:///generated/api/v1.0.0/python/ap
 
 ```bash
 cd <path_to_superdex_physics>
-uv run --no-project examples/example_tendon_comparison.py
+uv run examples/example_tendon_comparison.py
 ```
 
 When run, three copies of the same four-bone chain will appear side by side, offset by 0.5 m along $z$. All three are driven by the same raised-cosine slider pull, so they curl and relax together on a shared cycle. What differs is the tendon rendered between the guides.

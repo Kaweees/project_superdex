@@ -170,7 +170,7 @@ physics.shutdown()
 ## Running
 
 ```bash
-uv run --no-project examples/example_ik.py
+uv run examples/example_ik.py
 ```
 
 `debugger.attach()` launches or focuses the Debugger and waits for it to connect; the arm holds each solved pose for a second before jumping to the next target. Detaching the Debugger ends the loop and prints how many solves converged and how many of the sampled targets were reached. Targets come from a seeded generator, so repeated runs are identical. See [Inspecting Scenes](../../debugging_scenes.md) for debugger connection, navigation, and playback controls.

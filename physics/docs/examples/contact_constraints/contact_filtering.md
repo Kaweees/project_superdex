@@ -78,7 +78,7 @@ This two-level system provides coarse-grained control (layers) with fine-grained
 ## Running
 
 ```bash
-uv run --no-project examples/example_contact_filtering.py
+uv run examples/example_contact_filtering.py
 ```
 
 This example launches or focuses the SuperDex Physics Debugger and runs while it remains connected. See [Inspecting Scenes](../../debugging_scenes.md) for connection, navigation, and playback controls.

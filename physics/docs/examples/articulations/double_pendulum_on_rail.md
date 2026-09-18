@@ -203,7 +203,7 @@ scene.enable_actor_contact_symmetric(
 ## Running
 
 ```bash
-uv run --no-project examples/example_articulations_double_pendulum_on_rail.py
+uv run examples/example_articulations_double_pendulum_on_rail.py
 ```
 
 This example launches or focuses the SuperDex Physics Debugger and runs while it remains connected. See [Inspecting Scenes](../../debugging_scenes.md) for connection, navigation, and playback controls.

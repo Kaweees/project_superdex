@@ -115,9 +115,10 @@ uv pip install torch==2.7.1 --extra-index-url https://download.pytorch.org/whl/c
 uv pip install "ray[rllib]==2.49.0" "moviepy" "pillow>=10.1" "tensorboard"
 ```
 
-These dependencies are outside the lock. If you rerun `uv sync --extra core`,
-reinstall them afterward. Run RLlib training with `uv run --no-project` to avoid Ray's
-working-directory check; other app scripts use plain `uv run`.
+These manual installs are not recorded as requested dependencies of the root project,
+so running `uv sync` again can remove unlisted packages or restore locked versions.
+The `superdex_lab` project is unmanaged by `uv`, so plain `uv run` from its directory
+tree uses the existing environment without synchronizing it.
 
 The scripts under `apps/rllib/` import their siblings by bare name. Start in the
 `project_superdex` root; the first command changes the working directory to
@@ -125,7 +126,7 @@ The scripts under `apps/rllib/` import their siblings by bare name. Start in the
 
 ```bash
 cd superdex_lab/apps/rllib
-uv run --no-project python train_samples.py --help
+uv run python train_samples.py --help
 ```
 
 ## Running the Tests

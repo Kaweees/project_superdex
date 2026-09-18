@@ -183,7 +183,7 @@ The result has one generalized-force value per articulation DoF. Translational D
 ## Running
 
 ```bash
-uv run --no-project examples/example_articulations_pose_controller.py
+uv run examples/example_articulations_pose_controller.py
 ```
 
 The example runs through all three phases and keeps tracing the circular trajectory until the Debugger disconnects. See [Inspecting Scenes](../../debugging_scenes.md) for debugger connection, navigation, and playback controls.

@@ -194,7 +194,7 @@ force = soft_actor.get_contact_force_from_actor_world(ball)
 ## Running
 
 ```bash
-uv run --no-project examples/example_articulations_soft_skinned_double_pendulum.py
+uv run examples/example_articulations_soft_skinned_double_pendulum.py
 ```
 
 This example launches or focuses the SuperDex Physics Debugger and runs while it remains connected. See [Inspecting Scenes](../../debugging_scenes.md) for connection, navigation, and playback controls.

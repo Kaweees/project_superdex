@@ -135,7 +135,7 @@ As the damped motion settles, the computed displacement approaches the published
 Run the example:
 
 ```bash
-uv run --no-project examples/example_slit_annular_ring.py
+uv run examples/example_slit_annular_ring.py
 ```
 
 The debugger displays the deformation and controls how long the simulation runs. Displacement logging appears in the terminal once simulation playback begins. See [Inspecting Scenes](../../debugging_scenes.md) for debugger connection, navigation, and playback controls.

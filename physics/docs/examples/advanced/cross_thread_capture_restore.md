@@ -126,7 +126,7 @@ For clarity, this example does not guard every partially completed setup or roll
 ## Running
 
 ```bash
-uv run --no-project examples/example_cross_thread_capture_restore.py
+uv run examples/example_cross_thread_capture_restore.py
 ```
 
 The script captures the source scene, then calls [`physics.debugger.attach()`](pathname:///generated/api/v1.0.0/python/api/debugger.html#superdex.physics.debugger.attach), which launches or focuses the SuperDex Physics Debugger and waits for a connection. The stationary source is selected initially, and the two rollout scenes start after attachment. Press Play once, then switch to either rollout to see both trajectories advance; each resets every five seconds. Closing or disconnecting the Debugger normally ends the loops and cleans up all three scenes. See [Inspecting Scenes](../../debugging_scenes.md) for debugger connection, navigation, and playback controls.
