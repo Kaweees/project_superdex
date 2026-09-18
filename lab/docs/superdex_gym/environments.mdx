@@ -414,34 +414,26 @@ underscore-separated segments:
 - It must be snake_case. The Gymnasium ID is built by capitalizing each segment, so
   `cartpole_env_nogravity.json` yields `CartPoleNogravity-v0`, not `CartPoleNoGravity-v0`.
 - `env`, `train` and `benchmark` are reserved segments. A file using one is silently
-  ignored (a debug log line only) — this is what keeps a longer sibling module's files
-  and the usage recipes below unambiguous.
+  ignored (a debug log line only), keeping longer sibling modules and reserved usage
+  categories unambiguous.
 - A `test` segment (`cartpole_env_test_damped_free_pole.json`) marks the variant
   **test-only**: it is discovered and exercised by the generated smoke tests, but
   `register_all_envs()` skips it and `get_env_short_names()` hides it, so it never
   appears as a Gymnasium ID or a CLI name. Test-only variants are degenerate
   configurations worth crash-checking but not shippable tasks.
 
-### Usage configs — a different convention
+### RLlib recipes use explicit manifests
 
-Dot-separated files sitting next to a module are **usage recipes**, not
-environments. They are never registered and never discovered as Gymnasium IDs.
+RLlib recipes are separate from environment discovery. Public recipes live under
+`superdex/lab/rllib/recipes/`. That directory has a `manifest.json` that maps an exact
+canonical Gymnasium ID to a filesystem-safe output slug and explicit `train` or
+`benchmark` recipe paths. The canonical loader is
+`superdex.lab.rllib.recipe_manifest`.
 
-| Filename pattern | Meaning |
-| --- | --- |
-| `<module>_<variant>.json` | Defines a new Gymnasium environment (above) |
-| `<module>.train.json` | Training recipe for the base env, read by `train_samples.py` |
-| `<module>_<variant>.train.json` | Training recipe for one variant |
-| `<module>.benchmark.json` | Configuration for the overhead benchmarks |
-| `<module>_<variant>.benchmark.json` | The same, for one variant |
-
-Current tools use `train` and `benchmark` recipes. A variant recipe does **not**
-fall back to the base recipe because each recipe applies to one configuration. A
-`train` recipe contains training settings, not environment configuration, so every
-trained configuration must also be a named, discoverable variant.
-
-The single underscore versus the dot is the whole distinction, so be careful naming
-new files.
+A variant recipe does **not** fall back to the base recipe: only IDs listed explicitly
+in a manifest have recipes, and a base does not inherit a variant's recipe either.
+Training recipes contain algorithm settings, not environment configuration, so every
+trained configuration must be represented by its own registered canonical Gymnasium ID.
 
 ## Scene and Actor Helpers
 

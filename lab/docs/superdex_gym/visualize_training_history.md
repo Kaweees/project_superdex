@@ -20,7 +20,7 @@ Checkpoint videos are off by default. Pass `--video_on_checkpoint` to
 ```bash
 cd superdex_lab/apps/rllib
 uv run python train_samples.py \
-  --pattern "cart_pole" --checkpoint_freq 2 --video_on_checkpoint
+  --pattern "superdex_gym/CartPole-v0" --checkpoint_freq 2 --video_on_checkpoint
 ```
 
 If the selected checkpoints do not contain videos, the visualization command can
@@ -92,7 +92,7 @@ tool creates missing parent directories. Each clip is labeled
 | `--font_path` | PIL's built-in font | TrueType font file to use instead. The built-in scalable font requires Pillow 10.1 or newer. |
 | `--head_seconds` | `1.0` | Seconds to hold each clip's first frame before playback. |
 | `--tail_seconds` | `1.0` | Seconds to hold each clip's last frame after playback. |
-| `--transition_seconds` | `0.5` | Crossfade duration between clips. It must not exceed `--head_seconds` or `--tail_seconds`. |
+| `--transition_seconds` | `0.5` | Crossfade duration between clips. It must not exceed `--head_seconds` or `--tail_seconds`, so the blend covers only frozen frames. |
 
 For example, create a 10-clip montage weighted toward early training, at half
 speed, with a larger red label in the top-left:
