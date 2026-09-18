@@ -30,9 +30,9 @@ cd superdex_lab/apps/envs
 Run the smallest environment as a smoke test:
 
 ```bash
-# Smoke test. Any environment name works; cart_pole is the smallest.
+# Smoke test. Any registered environment works; CartPole is the smallest.
 uv run python benchmark.py \
-  --env cart_pole --num_workers 1 --num_envs_per_worker 1
+  --env superdex_gym/CartPole-v0 --num_workers 1 --num_envs_per_worker 1
 ```
 
 ## Expected Output
@@ -42,7 +42,7 @@ planned configuration and system resources, then reports initialization and memo
 measurements, progress, and a profiler summary with this structure:
 
 ```text
-Benchmarking env 'cart_pole' for 1 combinations:
+Benchmarking env 'superdex_gym/CartPole-v0' for 1 combinations:
 - 1 workers × 1 envs/worker = 1 envs
 
 Logical CPUs: <logical CPU count>
@@ -67,17 +67,17 @@ twice.
 
 ```bash
 # Sweep worker/environment combinations (3 x 4 = 12 configurations).
-uv run python benchmark.py --env cart_pole --num_workers 1,4,8 --num_envs_per_worker 1,5,25,125
+uv run python benchmark.py --env superdex_gym/CartPole-v0 --num_workers 1,4,8 --num_envs_per_worker 1,5,25,125
 
 # Benchmark every CLI-visible environment with 8 workers and 20 envs/worker.
 uv run python benchmark.py --all --num_workers 8 --num_envs_per_worker 20
 
 # Custom timing constraints for a longer run.
-uv run python benchmark.py --env cart_pole --num_workers 8 --num_envs_per_worker 20 \
+uv run python benchmark.py --env superdex_gym/CartPole-v0 --num_workers 8 --num_envs_per_worker 20 \
   --min_time 10.0 --max_time 120.0 --min_iterations 50
 
 # Export results to JSON.
-uv run python benchmark.py --env cart_pole --num_workers 8 --num_envs_per_worker 20 \
+uv run python benchmark.py --env superdex_gym/CartPole-v0 --num_workers 8 --num_envs_per_worker 20 \
   --write_to_file
 ```
 
@@ -85,8 +85,8 @@ uv run python benchmark.py --env cart_pole --num_workers 8 --num_envs_per_worker
 
 The main benchmarking script, `apps/envs/benchmark.py`, measures throughput across
 worker and per-worker environment counts. Select one environment with `--env`, or
-every CLI-visible environment with `--all`. Run with `--help` to list the available
-names.
+every registered environment with `--all`. Run with `--help` to list the available
+canonical IDs.
 
 It supports:
 
@@ -136,8 +136,8 @@ therefore extend a run past the other metric's maximum.
 
 | Option | Default | Notes |
 | --- | --- | --- |
-| `--env` | required unless `--all` | Environment CLI name. Validated against discovery. |
-| `--all` | off | Benchmark every environment available to the CLI. Mutually exclusive with `--env`. |
+| `--env` | required unless `--all` | Canonical Gymnasium ID. Validated against the registered SuperDex environments. |
+| `--all` | off | Benchmark every registered SuperDex environment. Mutually exclusive with `--env`. |
 | `--num_workers` | required | Accepts one or more positive integers, separated by spaces and/or commas. |
 | `--num_envs_per_worker` | required | Accepts one or more positive integers, separated by spaces and/or commas. |
 | `--min_iterations` | `10` | Minimum batched `step()` calls per configuration |

@@ -60,37 +60,39 @@ Here are some usage examples before we walk through the available options:
 
 ```bash
 # Run CartPole with random actions for 5 episodes
-uv run python run_sample.py cart_pole --action_sampler random --num_episodes 5
+uv run python run_sample.py superdex_gym/CartPole-v0 --action_sampler random --num_episodes 5
 
 # Run Ant with sweep actions and record video
-uv run python run_sample.py ant --action_sampler sweep --video
+uv run python run_sample.py superdex_gym/Ant-v0 --action_sampler sweep --video
 
 # Record at a custom resolution
-uv run python run_sample.py ant --action_sampler random --video --video_size 1920x1080
+uv run python run_sample.py superdex_gym/Ant-v0 --action_sampler random --video --video_size 1920x1080
 
 # Run a config variant
-uv run python run_sample.py half_cheetah_full_observation --action_sampler sweep
+uv run python run_sample.py superdex_gym/HalfCheetahFullObservation-v0 --action_sampler sweep
 
 # Start the environment in a paused state
-uv run python run_sample.py half_cheetah --start_paused
+uv run python run_sample.py superdex_gym/HalfCheetah-v0 --start_paused
 ```
 
 ### Available Sample Environments
 
-`uv run python run_sample.py --help` lists the environments discovered in your current install. The repository currently provides these options:
+`uv run python run_sample.py --help` lists the canonical Gymnasium IDs registered in your current install. The repository currently provides these public IDs:
 
-- **Benchmarks**: `ant`, `ant_full_observation`, `ant_no_contact`,
-  `ant_rotation_vector`, `cart_pole`, `cart_pole_actuate_on_pole`, `half_cheetah`,
-  `half_cheetah_full_observation`
+- `superdex_gym/Ant-v0`
+- `superdex_gym/AntFullObservation-v0`
+- `superdex_gym/AntNoContact-v0`
+- `superdex_gym/AntRotationVector-v0`
+- `superdex_gym/CartPole-v0`
+- `superdex_gym/CartPoleActuateOnPole-v0`
+- `superdex_gym/HalfCheetah-v0`
+- `superdex_gym/HalfCheetahFullObservation-v0`
 
-These are environment CLI names that can be passed to the script.
-
-Names with a suffix (e.g., `_no_contact`) are alternative configurations of the same
-environment. `--help` lists base environments and registered config variants present in the current build; it omits test-only variants and `train` or `benchmark` recipe files (see [Environment file naming](./rllib.md#environment-file-naming)).
+Each config variant has its own registered ID. `--help` lists the base environments and registered variants present in the current build.
 
 ### Command-Line Options
 
-The environment name is a required argument. The remaining options are:
+The canonical environment ID is a required argument. The remaining options are:
 
 | Option | Default | Notes |
 | --- | --- | --- |
@@ -157,14 +159,14 @@ script has no timing, FPS or profiler code.
 
 This is the default configuration:
 
-- `CartPoleEnv`, constructed with `cfg={"render_mode": None}`
+- `superdex_gym/CartPole-v0`, constructed with `cfg={"render_mode": None}`
 - 9 environments
 - 3 environments per worker (3 async workers total)
 - 200 control steps
 
 Modify the `__main__` block to change:
 
-- Environment type (`cls`)
+- Canonical environment ID (`env_id`)
 - Environment configuration (`cfg`)
 - Number of environments (`num_environments`)
 - Environments per worker (`num_environments_per_worker`)
