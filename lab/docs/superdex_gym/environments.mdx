@@ -370,8 +370,9 @@ register_all_envs()
 env = gym.make("superdex_gym/CartPole-v0")
 ```
 
-`register_all_envs()` is idempotent — Gymnasium IDs already in the registry are left
-alone.
+`register_all_envs()` is idempotent for equivalent specs — a Gymnasium ID already in
+the registry with a matching spec is left alone, while an incompatible existing
+registration raises `ValueError`.
 :::
 
 Pass configuration through `cfg`:
