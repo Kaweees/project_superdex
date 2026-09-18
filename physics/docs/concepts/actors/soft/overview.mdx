@@ -91,7 +91,7 @@ ShapeHandle meshShape = context->LoadShapeFromFile("duck.mochi.h5", error);
 <TabItem value="python" label="Python">
 
 ```python
-tet_mesh_shape = mochi.load_shape_from_file(file_path="duck.mochi.h5")
+tet_mesh_shape = sdp.load_shape_from_file(file_path="duck.mochi.h5")
 ```
 
 </TabItem>
@@ -124,10 +124,10 @@ Actor* softActor = scene->CreateSoftActor(params, error);
 soft_actor = scene.create_soft_actor(
     name="duck",
     shape=tet_mesh_shape,
-    world_from_local=mochi.TransformRT(translation=[0, 1, 0]),
-    material=mochi.SoftMaterialParams(
-        type=mochi.SoftMaterialType.NeoHookean,
-        neo_hookean=mochi.NeoHookeanMaterialParams(
+    world_from_local=sdp.TransformRT(translation=[0, 1, 0]),
+    material=sdp.SoftMaterialParams(
+        type=sdp.SoftMaterialType.NeoHookean,
+        neo_hookean=sdp.NeoHookeanMaterialParams(
             youngs_modulus=1e5,
             poisson_ratio=0.45,
         ),

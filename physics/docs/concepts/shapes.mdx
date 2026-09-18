@@ -32,7 +32,7 @@ The public actor-creation API assembles articulated actors from ordinary shape h
 
 [`ModelData`](pathname:///generated/api/v1.0.0/cpp/structsuperdex_1_1ModelData.html) is a caller-owned, serializable description used to construct one registered shape. It must provide one primary geometry: [`mesh`](pathname:///generated/api/v1.0.0/cpp/structsuperdex_1_1ModelData.html), [`box`](pathname:///generated/api/v1.0.0/cpp/structsuperdex_1_1ModelData.html), [`plane`](pathname:///generated/api/v1.0.0/cpp/structsuperdex_1_1ModelData.html), or [`sphere`](pathname:///generated/api/v1.0.0/cpp/structsuperdex_1_1ModelData.html).
 
-A mesh-backed model can include auxiliary visual, simulation, and material data, as well as a precomputed grid of signed-distance function (SDF) evaluations used for contact queries. Not every primary geometry supports every auxiliary data type.
+A mesh-backed model can include auxiliary visual and contact-skin meshes, simulation and material data, and a precomputed grid of signed-distance function (SDF) evaluations used for contact queries. Not every primary geometry supports every auxiliary data type.
 
 While `Shape`s can carry data used for contact, actors and articulated links separately select whether and how they act as colliders. See [Collider Representations](./contact.md#collider-representations) for those configuration options.
 
@@ -42,8 +42,8 @@ Model-data loading supports SuperDex Physics JSON (`.mochi.json`), SuperDex Phys
 
 | Operation | C++ / Python |
 |---|---|
-| **Load model data** | `model_utils::LoadFromFile` / [`physics.model.load_from_file`](pathname:///generated/api/v1.0.0/python/api/models.html#superdex.physics.model.load_from_file) |
-| **Save model data** | `model_utils::SaveToFile` / [`physics.model.save_to_file`](pathname:///generated/api/v1.0.0/python/api/models.html#superdex.physics.model.save_to_file) |
+| **Load model data** | `model_utils::LoadFromFile` / [`sdp.model.load_from_file`](pathname:///generated/api/v1.0.0/python/api/models.html#superdex.physics.model.load_from_file) |
+| **Save model data** | `model_utils::SaveToFile` / [`sdp.model.save_to_file`](pathname:///generated/api/v1.0.0/python/api/models.html#superdex.physics.model.save_to_file) |
 | **Register as a shape** | [`CreateModelShape`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Context.html) / [`create_model_shape`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.create_model_shape) |
 
 ## Creating Shapes
@@ -66,8 +66,8 @@ ShapeHandle planeShape = context->CreatePlaneShape(
 <TabItem value="python" label="Python">
 
 ```python
-sphere_shape = mochi.create_sphere_shape(center=[0, 0, 0], radius=0.2)
-plane_shape = mochi.create_plane_shape(normal=[0, 1, 0], distance=0)
+sphere_shape = sdp.create_sphere_shape(center=[0, 0, 0], radius=0.2)
+plane_shape = sdp.create_plane_shape(normal=[0, 1, 0], distance=0)
 ```
 
 </TabItem>
@@ -95,8 +95,8 @@ ShapeHandle triShape =
 <TabItem value="python" label="Python">
 
 ```python
-tet_shape = mochi.create_tet_mesh_shape(tet_coordinates, tet_connectivity)
-tri_shape = mochi.create_tri_mesh_shape(tri_coordinates, tri_connectivity)
+tet_shape = sdp.create_tet_mesh_shape(tet_coordinates, tet_connectivity)
+tri_shape = sdp.create_tri_mesh_shape(tri_coordinates, tri_connectivity)
 ```
 
 </TabItem>
@@ -124,12 +124,12 @@ ShapeHandle polylineShape = context->CreateMeshShape(polyline, error);
 <TabItem value="python" label="Python">
 
 ```python
-polyline = mochi.MeshData(
+polyline = sdp.MeshData(
     nodes_per_element=2,
     coordinates=[0, 0, 0, 1, 0, 0, 1, 1, 0],
     connectivity=[0, 1, 1, 2],
 )
-polyline_shape = mochi.create_mesh_shape(polyline)
+polyline_shape = sdp.create_mesh_shape(polyline)
 ```
 
 </TabItem>
@@ -157,12 +157,12 @@ ShapeHandle bakedShape = context->LoadShapeFromFile(
 <TabItem value="python" label="Python">
 
 ```python
-shape = mochi.load_shape_from_file("models/part.obj")
+shape = sdp.load_shape_from_file("models/part.obj")
 
-baked_shape = mochi.load_shape_from_file(
+baked_shape = sdp.load_shape_from_file(
     "models/part.mochi.h5",
     bake_scale=[0.5, 0.5, 0.5],
-    bake_transform=mochi.TransformRT(),
+    bake_transform=sdp.TransformRT(),
 )
 ```
 
@@ -204,7 +204,7 @@ Actor* actor = scene->CreateRigidActor(params, error);
 ```python
 actor = scene.create_rigid_actor(
     shape=sphere_shape,
-    world_from_local=mochi.TransformRT(translation=[0, 1, 0]),
+    world_from_local=sdp.TransformRT(translation=[0, 1, 0]),
 )
 ```
 

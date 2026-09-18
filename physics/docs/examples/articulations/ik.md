@@ -21,14 +21,14 @@ For the objective function, the Newton solve, the full solver parameter referenc
 
 ### Create the IK Scene
 
-The solver reconfigures its scene into a quasistatic optimizer — infinite timestep, no gravity, no friction, no inertia — which makes that scene useless for rendering or dynamic simulation. A production application therefore keeps a second scene for display and copies the solved pose across. This example is IK-only, so one dedicated scene is enough.
+The solver reconfigures its scene into a quasistatic optimizer — infinite timestep, no gravity, no contact dissipation, no joint friction, and no inertia — which makes that scene useless for rendering or dynamic simulation. A production application therefore keeps a second scene for display and copies the solved pose across. This example is IK-only, so one dedicated scene is enough.
 
 ```python
-ik_scene = physics.create_scene("Inverse Kinematics Scene")
+ik_scene = sdp.create_scene("Inverse Kinematics Scene")
 ik_scene.set_gravity([0, 0, 0])
 articulation = load_articulation(ik_scene)
 
-ik_solver = physics.experimental.create_ik_solver(ik_scene)
+ik_solver = sdp.experimental.create_ik_solver(ik_scene)
 solver_params = ik_solver.get_solver_params()
 solver_params.max_iter = MAX_ITER
 ik_solver.set_solver_params(solver_params)
@@ -49,9 +49,9 @@ The prefab supplies a five-link chain whose inbound joints cover three of the fo
 ```
 
 ```python
-prefab_params = physics.prefab.PrefabParams()
+prefab_params = sdp.prefab.PrefabParams()
 prefab_params.scale = PREFAB_SCALE
-result = physics.prefab.add_to_scene(
+result = sdp.prefab.add_to_scene(
     prefab_path=str(resolve_asset(PREFAB_PATH)),
     root_path=str(resolve_asset_root(PREFAB_PATH)),
     scene=scene,
@@ -72,14 +72,14 @@ The links are boxes that overlap at the joints. Because the solve honours contac
 ROOT_PIVOT_LOCAL_POSITION = [0.05 * PREFAB_SCALE, 0, 0]  # [m]
 ROOT_PIVOT_STIFFNESS = 1e4  # [N/m] and [N*m/rad]
 
-position_params = physics.RigidPivotPositionConstraintParams()
+position_params = sdp.RigidPivotPositionConstraintParams()
 position_params.local_position = ROOT_PIVOT_LOCAL_POSITION
 position_params.target_position = [0, 0, 0]
 position_params.actor = root
 position_params.stiffness = ROOT_PIVOT_STIFFNESS
 scene.create_rigid_pivot_position_constraint(position_params)
 
-rotation_params = physics.RigidPivotRotationConstraintParams()
+rotation_params = sdp.RigidPivotRotationConstraintParams()
 rotation_params.local_rotation = [0, 0, 0]
 rotation_params.target_rotation = [0, 0, 0]
 rotation_params.actor = root
@@ -142,19 +142,19 @@ Targets are sampled in a small box around the origin, where the pinned base sits
 The loop solves once per iteration and counts two separate things: how many Newton solves converged, and how many targets were actually met. Because the goals are random, some are unreachable - `solve_ik` returning `False` is an expected outcome here, not an error.
 
 ```python
-if not physics.debugger.attach():
+if not sdp.debugger.attach():
     return
 
 rng = random.Random(RANDOM_SEED)
 
-while physics.debugger.is_attached():
+while sdp.debugger.is_attached():
     ...
     if ik_solver.solve_ik():
         reached += 1
     solves += 1
 
     status = scene.get_solver_stats().convergence_status
-    if status == physics.ConvergenceStatus.CONVERGED:
+    if status == sdp.ConvergenceStatus.CONVERGED:
         converged += 1
 ```
 
@@ -163,8 +163,8 @@ while physics.debugger.is_attached():
 The solved pose stays in the IK actor, where [`get_articulated_pose()`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Actor.get_articulated_pose) would read it back for transfer to a visualization scene. On exit, destroying the solver destroys the scene it owns, so the scene is never destroyed separately:
 
 ```python
-physics.experimental.destroy_ik_solver(ik_solver)
-physics.shutdown()
+sdp.experimental.destroy_ik_solver(ik_solver)
+sdp.shutdown()
 ```
 
 ## Running

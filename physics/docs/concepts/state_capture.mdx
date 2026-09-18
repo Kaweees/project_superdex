@@ -95,7 +95,7 @@ sceneTo->RestoreStateFromBytes(stateBytes, error);
 <TabItem value="python" label="Python">
 
 ```python
-state_buffer = physics.DynamicArrayUint8()
+state_buffer = sdp.DynamicArrayUint8()
 scene_from.capture_state_to_bytes(state_buffer)
 state_bytes = bytes(state_buffer)
 

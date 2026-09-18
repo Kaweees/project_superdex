@@ -23,7 +23,7 @@ A shape may additionally contain a distinct triangular visual mesh embedded in t
 from superdex.physics.paths import resolve_asset
 
 shape_path = str(resolve_asset("duck/duck_1899.mochi.h5"))
-tet_mesh_shape = physics.load_shape_from_file(
+tet_mesh_shape = sdp.load_shape_from_file(
     file_path=shape_path,
 )
 ```
@@ -38,7 +38,7 @@ Create a soft actor from the tetrahedral shape and place it above the ground:
 soft_duck_actor = scene.create_soft_actor(
     name="duck",
     shape=tet_mesh_shape,
-    world_from_local=physics.TransformRT(translation=[-0.5, 0.5, -1.0]),
+    world_from_local=sdp.TransformRT(translation=[-0.5, 0.5, -1.0]),
 )
 ```
 
@@ -49,7 +49,7 @@ By default, SuperDex Physics uses a stable Neo-Hookean material with default den
 The ground is a static rigid actor with an implicit plane shape:
 
 ```python
-plane_shape = physics.create_plane_shape(normal=[0, 1, 0], distance=-0.5)
+plane_shape = sdp.create_plane_shape(normal=[0, 1, 0], distance=-0.5)
 rigid_plane_actor = scene.create_rigid_actor(
     name="ground",
     shape=plane_shape,
@@ -61,18 +61,18 @@ No example-specific contact setup is required. The duck supplies deformable surf
 
 ### Simulation and Lifecycle
 
-The example attaches the remote debugger and advances the scene at 60 Hz. Its cleanup function explicitly demonstrates actor, scene, and global resource destruction. Destroying actors is unnecessary immediately before destroying their scene, and destroying the scene is unnecessary immediately before [`physics.shutdown()`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.shutdown).
+The example attaches the remote debugger and advances the scene at 60 Hz. Its cleanup function explicitly demonstrates actor, scene, and global resource destruction. Destroying actors is unnecessary immediately before destroying their scene, and destroying the scene is unnecessary immediately before [`sdp.shutdown()`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.shutdown).
 
 ```python
 TIME_STEP = 1.0 / 60.0  # [s]
-if physics.debugger.attach():
-    while physics.debugger.is_attached():
+if sdp.debugger.attach():
+    while sdp.debugger.is_attached():
         scene.step(TIME_STEP)
 
 scene.destroy_actor(soft_duck_actor)
 scene.destroy_actor(rigid_plane_actor)
-physics.destroy_scene(scene)
-physics.shutdown()
+sdp.destroy_scene(scene)
+sdp.shutdown()
 ```
 
 ## Running

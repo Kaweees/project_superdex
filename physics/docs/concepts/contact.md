@@ -213,6 +213,18 @@ This restitution behavior is a property of the continuous-time [dynamics](./dyna
 
 For a contact pair, friction and damping coefficients are the geometric means of the actors' values. The penalty coefficient and friction falloff velocity are also geometric means when both actors are dynamic, but are taken from the colliding actor when the collider is static. Other contact parameters, including the smoothing distance and contact threshold, are taken from the collider.
 
+The geometric-mean heuristic for combining per-actor contact parameters reduces the dimensionality of a scene's parameter space, but it can limit precise calibration of quantities such as friction coefficients, which are properties of material pairs rather than individual materials. When the parameter-combination heuristic is insufficient, use [`Scene::SetContactPairParamsOverride`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Scene.html) / [`set_contact_pair_params_override`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Scene.set_contact_pair_params_override) with a `ContactPairParamsOverride` ([C++](pathname:///generated/api/v1.0.0/cpp/structsuperdex_1_1ContactPairParamsOverride.html), [Python](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.ContactPairParamsOverride)) to override the combined penalty coefficient, friction falloff velocity, viscous and Coulomb friction coefficients, or normal viscous damping coefficient for an exact unordered actor pair. Unset fields retain the normal combination rule. Setting another override replaces the pair's complete override; it does not merge with the previous value.
+
+```python
+scene.set_contact_pair_params_override(
+    actor_a.get_handle(),
+    actor_b.get_handle(),
+    sdp.ContactPairParamsOverride(coulomb_friction_coefficient=0.8),
+)
+```
+
+The corresponding `Clear`, `Has`, and `Get` methods manage the stored override. Like the single-actor setter [`Actor::SetContactParams`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Actor.html) / [`set_contact_params`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Actor.set_contact_params), the pair-override setter applies only to the exact actors passed; it does not expand parent actors to their nested actors. This differs from [actor-pair contact filtering](#contact-filtering), which includes nested actors by default.
+
 #### Double-Integral Generalization
 
 The `PointCloud` collider has no single field $\phi_B$. Instead, each material point $\mathbf{X}_B$ acts as a moving-sphere collider $B_{\mathbf{X}_B}$ with center $\mathbf{x}_B(\mathbf{X}_B,t)$, radius $L_B$, and SDF

@@ -69,6 +69,10 @@ Actor entries identify actors by name or hierarchy path. With `includeNestedActo
 
 Nested prefab filters are applied before parent filters, so a parent can override a child in the same actor or layer table. Within a prefab, categories are applied in this order: [`layerContactAsymmetric`](pathname:///generated/api/v1.0.0/cpp/structsuperdex_1_1prefab_1_1ContactFilter.html), [`layerContactSymmetric`](pathname:///generated/api/v1.0.0/cpp/structsuperdex_1_1prefab_1_1ContactFilter.html), [`actorContactAsymmetric`](pathname:///generated/api/v1.0.0/cpp/structsuperdex_1_1prefab_1_1ContactFilter.html), then [`actorContactSymmetric`](pathname:///generated/api/v1.0.0/cpp/structsuperdex_1_1prefab_1_1ContactFilter.html). Entries within each array are applied in order, and later entries can override earlier entries in the same table. Actor entries can also re-enable automatically disabled adjacent-link pairs.
 
+## Contact Parameter Overrides
+
+The optional [`contactPairParamsOverrides`](pathname:///generated/api/v1.0.0/cpp/structsuperdex_1_1prefab_1_1ScenePrefab.html) array sets partial contact-parameter overrides for exact unordered actor pairs. Each `ContactPairParamsOverrideEntry` ([C++](pathname:///generated/api/v1.0.0/cpp/structsuperdex_1_1prefab_1_1ContactPairParamsOverrideEntry.html), [Python](pathname:///generated/api/v1.0.0/python/api/prefab.html#superdex.physics.prefab.ContactPairParamsOverrideEntry)) names exactly two actors and supplies a non-empty `paramsOverride`; omitted parameters retain their normal actor-pair combination. Names and hierarchy paths resolve like actor contact-filter entries, but parent actors do not expand to their nested actors. Entries are applied in order after actor creation, with parent-prefab entries applied after nested-prefab entries; a later entry for the same pair replaces the earlier override rather than merging with it.
+
 ## Loading
 
 Use the top-level prefab's resolved path and the asset root that owns it:
@@ -90,28 +94,28 @@ auto result = superdex::prefab::AddToScene(
 <TabItem value="python" label="Python">
 
 ```python
-import superdex.physics as physics
+import superdex.physics as sdp
 from superdex.physics.paths import resolve_asset, resolve_asset_root
 
 relative_path = "table/table.mochi_scene"
-result = physics.prefab.add_to_scene(
+result = sdp.prefab.add_to_scene(
     prefab_path=str(resolve_asset(relative_path)),
     root_path=str(resolve_asset_root(relative_path)),
     scene=scene,
-    params=physics.prefab.PrefabParams(name="table"),
+    params=sdp.prefab.PrefabParams(name="table"),
 )
 ```
 
 </TabItem>
 </Tabs>
 
-The file overload loads nested prefabs and shapes before instantiation. C++ `AddToScene` and Python [`physics.prefab.add_to_scene()`](pathname:///generated/api/v1.0.0/python/api/prefab.html#superdex.physics.prefab.add_to_scene) apply enabled top-level scene settings first, instantiate nested prefabs depth-first, then create each prefab's actors, constraints, and controllers before applying its contact filter. The operation is not transactional: if loading or instantiation reports an error, earlier scene-setting changes and created objects may remain in the scene.
+The file overload loads nested prefabs and shapes before instantiation. C++ `AddToScene` and Python [`sdp.prefab.add_to_scene()`](pathname:///generated/api/v1.0.0/python/api/prefab.html#superdex.physics.prefab.add_to_scene) apply enabled top-level scene settings first, instantiate nested prefabs depth-first, then create each prefab's actors, constraints, and controllers before applying its contact filter and contact-pair parameter overrides. The operation is not transactional: if loading or instantiation reports an error, earlier scene-setting changes and created objects may remain in the scene.
 
-For repeated instances, load a `ScenePrefab` ([C++](pathname:///generated/api/v1.0.0/cpp/structsuperdex_1_1prefab_1_1ScenePrefab.html), [Python](pathname:///generated/api/v1.0.0/python/api/prefab.html#superdex.physics.prefab.ScenePrefab)) once and add it multiple times. The preloaded overload requires `PrefabParams::scale == 1`; use the file-path overload to scale the whole instance. C++ `LoadShapes` and Python [`physics.prefab.load_shapes()`](pathname:///generated/api/v1.0.0/python/api/prefab.html#superdex.physics.prefab.load_shapes) bake nested-reference and per-actor scales into geometry, so call them again on the top-level `ScenePrefab` after changing either.
+For repeated instances, load a `ScenePrefab` ([C++](pathname:///generated/api/v1.0.0/cpp/structsuperdex_1_1prefab_1_1ScenePrefab.html), [Python](pathname:///generated/api/v1.0.0/python/api/prefab.html#superdex.physics.prefab.ScenePrefab)) once and add it multiple times. The preloaded overload requires `PrefabParams::scale == 1`; use the file-path overload to scale the whole instance. C++ `LoadShapes` and Python [`sdp.prefab.load_shapes()`](pathname:///generated/api/v1.0.0/python/api/prefab.html#superdex.physics.prefab.load_shapes) bake nested-reference and per-actor scales into geometry, so call them again on the top-level `ScenePrefab` after changing either.
 
 ## Exporting
 
-Scenes can be exported to a prefab folder with C++ `ExportScene` or Python [`physics.prefab.export_scene()`](pathname:///generated/api/v1.0.0/python/api/prefab.html#superdex.physics.prefab.export_scene):
+Scenes can be exported to a prefab folder with C++ `ExportScene` or Python [`sdp.prefab.export_scene()`](pathname:///generated/api/v1.0.0/python/api/prefab.html#superdex.physics.prefab.export_scene):
 
 <Tabs groupId="language">
 <TabItem value="cpp" label="C++" default>
@@ -125,9 +129,9 @@ superdex::prefab::ExportScene(scene, "warehouse", outputDir, error);
 <TabItem value="python" label="Python">
 
 ```python
-import superdex.physics as physics
+import superdex.physics as sdp
 
-physics.prefab.export_scene(
+sdp.prefab.export_scene(
     scene=scene,
     export_name="warehouse",
     output_dir=output_dir,

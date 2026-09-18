@@ -10,25 +10,25 @@ Most documented Python [examples](./examples/0_getting_started.md) open the debu
 
 ## Connecting from Python
 
-Call [`physics.debugger.attach()`](pathname:///generated/api/v1.0.0/python/api/debugger.html#superdex.physics.debugger.attach) after creating the scene, then step the scene while the debugger remains connected:
+Call [`sdp.debugger.attach()`](pathname:///generated/api/v1.0.0/python/api/debugger.html#superdex.physics.debugger.attach) after creating the scene, then step the scene while the debugger remains connected:
 
 ```python
-import superdex.physics as physics
+import superdex.physics as sdp
 
 
 def main() -> None:
-    physics.initialize(num_worker_threads=-1)
+    sdp.initialize(num_worker_threads=-1)
     try:
-        scene = physics.create_scene("My Scene")
+        scene = sdp.create_scene("My Scene")
         # Add actors and constraints to the scene.
 
-        if not physics.debugger.attach():
+        if not sdp.debugger.attach():
             return
 
-        while physics.debugger.is_attached():
+        while sdp.debugger.is_attached():
             scene.step(1.0 / 60.0)
     finally:
-        physics.shutdown()
+        sdp.shutdown()
 
 
 if __name__ == "__main__":
@@ -36,6 +36,10 @@ if __name__ == "__main__":
 ```
 
 [`attach()`](pathname:///generated/api/v1.0.0/python/api/debugger.html#superdex.physics.debugger.attach) launches or focuses the debugger and waits briefly for it to connect. It returns `False` if no connection is established. Closing or disconnecting the debugger makes [`is_attached()`](pathname:///generated/api/v1.0.0/python/api/debugger.html#superdex.physics.debugger.is_attached) return `False`, allowing the application to leave its simulation loop and clean up.
+
+## Controlling Debug Draw
+
+In the properties panel, **Show Debug Draw** is the master switch for the selected scene. Expand **Debug Draw** to enable individual features; enabling any feature also enables the master switch. Once connected, the debugger's selections are authoritative, persist across disconnects, and are applied when you select a scene.
 
 ## Moving the Camera
 

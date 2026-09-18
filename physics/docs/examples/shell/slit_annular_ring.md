@@ -28,7 +28,7 @@ The benchmark geometry and reference displacement are scaled down by a factor of
 The example loads a prepared asset consisting of a triangular physics mesh with 325 vertices, selected to approach the static solution within a few seconds of wall-clock time while maintaining an acceptable level of displacement error for manipulation problems:
 
 ```python
-shape = physics.load_shape_from_file(
+shape = sdp.load_shape_from_file(
     str(resolve_asset("samples/slit_annular_ring.mochi.h5"))
 )
 ```
@@ -42,7 +42,7 @@ In a larger engineering workflow, a third-party mesh generator or preprocessing 
 The material helper converts three-dimensional isotropic properties into the thickness-integrated membrane and bending parameters used by the shell actor:
 
 ```python
-material = physics.experimental.shell_material_params_from3d_isotropic(
+material = sdp.experimental.shell_material_params_from3d_isotropic(
     youngs_modulus3d=YOUNGS_MODULUS,
     poissons_ratio3d=POISSONS_RATIO,
     density3d=DENSITY,
@@ -50,13 +50,13 @@ material = physics.experimental.shell_material_params_from3d_isotropic(
 )
 material.mass_damping_coefficient = MASS_DAMPING_COEFFICIENT
 
-actor = physics.experimental.create_shell_actor(
+actor = sdp.experimental.create_shell_actor(
     scene,
-    physics.experimental.ShellActorParams(
+    sdp.experimental.ShellActorParams(
         name="SlitAnnularRing",
         shape=shape,
         material=material,
-        world_from_local=physics.TransformRT(),
+        world_from_local=sdp.TransformRT(),
         has_gravity=False,
     ),
 )
@@ -72,7 +72,7 @@ The first two azimuthal node columns on every radial ring are fixed at their ref
 
 ```python
 coordinates = np.asarray(
-    list(physics.get_shape_mesh(shape).coordinates), dtype=np_real
+    list(sdp.get_shape_mesh(shape).coordinates), dtype=np_real
 )
 fixed_positions = coordinates.reshape(-1, 3)[FIXED_NODES].reshape(-1)
 actor.add_boundary_condition_nodes_world(
@@ -109,7 +109,7 @@ As mentioned above, the original benchmark is a static problem, usually solved a
 ```python
 scene.set_gravity([0, 0, 0])
 
-while physics.debugger.is_attached():
+while sdp.debugger.is_attached():
     scene.step(TIME_STEP)
 ```
 

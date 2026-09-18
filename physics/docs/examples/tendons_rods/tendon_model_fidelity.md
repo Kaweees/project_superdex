@@ -48,17 +48,17 @@ This keeps the root fixed while prescribing a smooth raised-cosine pull at the s
 
 ## High Fidelity: Elastic Rod
 
-The rod begins as a straight polyline between the slider and distal eyelet attachment frames. `generate_tubular_rod_model_data()` adds a tubular visual surface and the embedding data that relates it to the simulated centerline:
+The rod begins as a straight polyline between the slider and distal eyelet attachment frames. `generate_tubular_rod_model_data()` adds a tubular contact skin and the embedding data that relates it to the simulated centerline:
 
 ```python
-model = physics.experimental.generate_tubular_rod_model_data(
+model = sdp.experimental.generate_tubular_rod_model_data(
     nodes=nodes,
     element_frame_axes=element_frame_axes,
     radius=ROD_RADIUS,
     num_cross_section_segments=ROD_NUM_CROSS_SECTION_SEGMENTS,
     is_closed_loop=False,
 )
-shape = physics.create_model_shape(model)
+shape = sdp.create_model_shape(model)
 ```
 
 If the generated model should be validated or serialized instead of registered directly, follow the [Authoring Assets](../../authoring_scenes/authoring_assets.mdx) workflow.
@@ -66,20 +66,20 @@ If the generated model should be validated or serialized instead of registered d
 The rod material parameters, omitted from these snippets, follow the homogeneous circular-cross-section formulas described in [Rod Actors: Parameter Selection](../../concepts/actors/rod.mdx#parameter-selection).
 
 ```python
-rod = physics.experimental.create_rod_actor(
+rod = sdp.experimental.create_rod_actor(
     scene,
-    physics.experimental.RodActorParams(
+    sdp.experimental.RodActorParams(
         name="TendonRod",
         shape=shape,
         material=material,
         layer="Tendon",
-        contact=physics.ContactParams(penalty_coefficient=PENALTY_COEFFICIENT),
-        use_visual_mesh_contact=True,
+        contact=sdp.ContactParams(penalty_coefficient=PENALTY_COEFFICIENT),
+        use_contact_skin=True,
     ),
 )
 ```
 
-With `use_visual_mesh_contact=True`, contact samples are placed on the tubular visual surface instead of on the rod centerline, and their forces are mapped to the rod degrees of freedom through the skinning Jacobian. This lets the tendon interact with the interior geometry of each eyelet across its finite cross-section.
+With `use_contact_skin=True`, contact samples are placed on the tubular contact skin instead of on the rod centerline, and their forces are mapped to the rod degrees of freedom through the skinning Jacobian. This lets the tendon interact with the interior geometry of each eyelet across its finite cross-section.
 
 The example also uses a custom penalty coefficient because contact between the narrow tendon and sharp eyelet geometry concentrates force over a small region. This regime falls outside the general object-manipulation scenarios for which the default penalty coefficient is selected.
 
@@ -117,21 +117,21 @@ The spatial tendon replaces the deformable rod with a sequence of points fixed i
 ```python
 route_names = (SLIDER_LINK_NAME, *EYELET_LINK_NAMES)
 elements = [
-    physics.RoutingElement(
-        type=physics.RoutingElementType.WAYPOINT,
+    sdp.RoutingElement(
+        type=sdp.RoutingElementType.WAYPOINT,
         index=art.link_indices[link_name],
         local_position=[0.0, 0.0, 0.0],
     )
     for link_name in route_names
 ]
-tendon_index = physics.experimental.add_spatial_tendon(
+tendon_index = sdp.experimental.add_spatial_tendon(
     art.actor,
-    physics.experimental.SpatialTendonParams(routing_elements=elements),
+    sdp.experimental.SpatialTendonParams(routing_elements=elements),
 )
-physics.experimental.attach_displacement_control_actuator(
+sdp.experimental.attach_displacement_control_actuator(
     art.actor,
     tendon_index,
-    physics.experimental.DisplacementControlActuatorParams(
+    sdp.experimental.DisplacementControlActuatorParams(
         stiffness=_actuator_stiffness(art.rest_length),
         target_displacement=0.0,
     ),
@@ -151,17 +151,17 @@ joint_indices = [
 ]
 joint_coefficients = [1.0] + [-LINEAR_MOMENT_ARM] * len(HINGE_JOINT_NAMES)
 
-tendon_index = physics.experimental.add_linear_transmission(
+tendon_index = sdp.experimental.add_linear_transmission(
     art.actor,
-    physics.experimental.LinearTransmissionParams(
+    sdp.experimental.LinearTransmissionParams(
         joint_indices=joint_indices,
         joint_coefficients=joint_coefficients,
     ),
 )
-physics.experimental.attach_displacement_control_actuator(
+sdp.experimental.attach_displacement_control_actuator(
     art.actor,
     tendon_index,
-    physics.experimental.DisplacementControlActuatorParams(
+    sdp.experimental.DisplacementControlActuatorParams(
         stiffness=_actuator_stiffness(art.rest_length),
         target_displacement=0.0,
     ),
@@ -183,7 +183,7 @@ For a straight rod of length $L$, area $A$, and Young's modulus $E$, the small-s
 
 ## Running
 
-Calling [`physics.debugger.attach()`](pathname:///generated/api/v1.0.0/python/api/debugger.html#superdex.physics.debugger.attach) launches or focuses the SuperDex Physics Debugger for visualization. See [Inspecting Scenes](../../debugging_scenes.md) for debugger connection, navigation, and playback controls. Execute the example from the SuperDex Physics root directory:
+Calling [`sdp.debugger.attach()`](pathname:///generated/api/v1.0.0/python/api/debugger.html#superdex.physics.debugger.attach) launches or focuses the SuperDex Physics Debugger for visualization. See [Inspecting Scenes](../../debugging_scenes.md) for debugger connection, navigation, and playback controls. Execute the example from the SuperDex Physics root directory:
 
 ```bash
 cd <path_to_superdex_physics>
@@ -192,18 +192,6 @@ uv run examples/example_tendon_comparison.py
 
 When run, three copies of the same four-bone chain will appear side by side, offset by 0.5 m along $z$. All three are driven by the same raised-cosine slider pull, so they curl and relax together on a shared cycle. What differs is the tendon rendered between the guides.
 
-Each of the three tendon models is drawn by a different debug-draw system, and these systems are off by default. The example enables debug draw and then activates the three it needs by name:
-
-```python
-debug_draw = scene.get_debug_draw()
-debug_draw.enable(True)
-debug_draw.enable_feature(debug_draw.find_feature("Rod Actor Polyline"), True)
-debug_draw.enable_feature(debug_draw.find_feature("Spatial Tendon"), True)
-debug_draw.enable_feature(
-    debug_draw.find_feature("Linear Transmission Terms"), True
-)
-```
-
-Without these calls the articulations and eyelets still render, but the tendons themselves are invisible. The reduced models have no surface geometry at all, and the rod would show only its tubular visual mesh (if toggled in the debugger) rather than the simulated centerline.
+The skin mesh of the rod-based tendon is rendered by default as the rod's physical surface, but the spatial tendon and linear transmission must be visualized using debug-draw systems. In the debugger's **Properties** panel, expand **Rendering** and then **Debug Draw**, and enable **Spatial Tendon** and **Linear Transmission Terms** to visualize the two transmission-based tendons.
 
 The rod renders as a deforming tube surrounding the simulated centerline polyline, and can be seen to fully resolve dynamic contact with the eyelets. The spatial tendon is depicted as a series of line segments between waypoints at the slider and inside each eyelet. The linear transmission has no associated geometry, and is represented abstractly by symbolic gizmos rendered at the joints, connected by a polyline that indicates mathematical coupling only, not the physical tendon path.

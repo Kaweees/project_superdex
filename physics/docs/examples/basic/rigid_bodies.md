@@ -18,11 +18,11 @@ For details about rigid-body dynamics and collision representations, see [Rigid 
 Every SuperDex Physics program starts by initializing the engine. A scene contains its actors, constraints, and simulation state.
 
 ```python
-import superdex.physics as physics
+import superdex.physics as sdp
 from superdex.physics.paths import resolve_asset, resolve_asset_root
 
-physics.initialize(num_worker_threads=0)
-scene = physics.create_scene("Rigid Bodies Scene")
+sdp.initialize(num_worker_threads=0)
+scene = sdp.create_scene("Rigid Bodies Scene")
 
 # The default gravity is (0, -9.8, 0); set it explicitly for illustration.
 scene.set_gravity([0, -9.8, 0])
@@ -35,7 +35,7 @@ A worker count of `0` runs on the calling thread. Use `-1` to let SuperDex Physi
 **1. Implicit shape** — An infinite plane needs no mesh data:
 
 ```python
-plane_shape = physics.create_plane_shape(normal=[0, 1, 0], distance=-1.0)
+plane_shape = sdp.create_plane_shape(normal=[0, 1, 0], distance=-1.0)
 ground_actor = scene.create_rigid_actor(
     name="ground",
     shape=plane_shape,
@@ -46,7 +46,7 @@ ground_actor = scene.create_rigid_actor(
 **2. Mesh loaded from a resolved asset** — Load a pre-built sphere and scale it to a radius of 0.2 m:
 
 ```python
-sphere_shape = physics.load_shape_from_file(
+sphere_shape = sdp.load_shape_from_file(
     file_path=str(resolve_asset("sphere/icosphere_3subdiv.1.mochi.json")),
     bake_scale=[0.2, 0.2, 0.2],
 )
@@ -72,7 +72,7 @@ connectivity = np.array(
     dtype=np.int32,
 ).flatten()
 
-cube_shape = physics.create_tri_mesh_shape(
+cube_shape = sdp.create_tri_mesh_shape(
     coordinates=coordinates,
     connectivity=connectivity,
 )
@@ -82,13 +82,13 @@ cube_shape = physics.create_tri_mesh_shape(
 
 ```python
 table_prefab_path = str(resolve_asset("table/table.mochi_scene"))
-physics.prefab.add_to_scene(
+sdp.prefab.add_to_scene(
     prefab_path=table_prefab_path,
     root_path=str(resolve_asset_root("table/table.mochi_scene")),
     scene=scene,
-    params=physics.prefab.PrefabParams(
+    params=sdp.prefab.PrefabParams(
         name="tablePrefab",
-        rotation=physics.Quaternion.rotation_x(-90 * math.pi / 180),
+        rotation=sdp.Quaternion.rotation_x(-90 * math.pi / 180),
         translation=[0, -1.0, 0],
     ),
 )
@@ -107,8 +107,8 @@ sphere_actor = scene.create_rigid_actor(
     shape=sphere_shape,
     is_static=False,
     density=1000.0,
-    world_from_local=physics.TransformRT(translation=[-0.5, 0.2, 0]),
-    collider_type=physics.ColliderType.SPHERE,
+    world_from_local=sdp.TransformRT(translation=[-0.5, 0.2, 0]),
+    collider_type=sdp.ColliderType.SPHERE,
 )
 ```
 
@@ -120,22 +120,22 @@ The example attaches the remote debugger, then advances the scene at 60 Hz until
 
 ```python
 TIME_STEP = 1.0 / 60.0  # [s]
-if physics.debugger.attach():
-    while physics.debugger.is_attached():
+if sdp.debugger.attach():
+    while sdp.debugger.is_attached():
         scene.step(TIME_STEP)
 ```
 
 ### Lifecycle Cleanup
 
-The example explicitly destroys actors, the scene, and global engine state to illustrate each lifecycle operation. Destroying individual actors is unnecessary immediately before destroying their scene, and destroying the scene is unnecessary immediately before [`physics.shutdown()`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.shutdown).
+The example explicitly destroys actors, the scene, and global engine state to illustrate each lifecycle operation. Destroying individual actors is unnecessary immediately before destroying their scene, and destroying the scene is unnecessary immediately before [`sdp.shutdown()`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.shutdown).
 
 ```python
 scene.destroy_actor(sphere_actor)
 scene.destroy_actor(cube_actor)
 scene.destroy_actor(ground_actor)
 scene.destroy_actor(table_actor)
-physics.destroy_scene(scene)
-physics.shutdown()
+sdp.destroy_scene(scene)
+sdp.shutdown()
 ```
 
 ## Running

@@ -41,45 +41,45 @@ An articulated actor is described by parallel `joints[]` and `links[]` arrays (s
 ROOT_HEIGHT = 0.5  # [m]
 ARM_SCALE = [0.25, 0.025, 0.025]  # [m]
 
-arm_shape = physics.load_shape_from_file(
+arm_shape = sdp.load_shape_from_file(
     file_path=str(resolve_asset("cube/cube_fine_mesh.mochi.json")),
     bake_scale=ARM_SCALE,  # corner-anchored cube [0,1]^3 -> [0, L] x [0, w] x [0, w]
 )
 
 # Shared skin asset: authored as tube along +X with per-node LBS weights to links 0/1.
-skin_shape = physics.load_shape_from_file(
+skin_shape = sdp.load_shape_from_file(
     file_path=str(resolve_asset("samples/articulations_parts/skin.mochi.json")),
     bake_scale=[1, 1, 1],  # bake only moves positions, never weights
 )
 
-params = physics.ArticulatedActorParams(name="SkinnedDoublePendulum")
+params = sdp.ArticulatedActorParams(name="SkinnedDoublePendulum")
 params.joints = [
-    physics.ArticulatedJointParams(
-        name="joint_0", type=physics.ArticulatedJointType.REVOLUTE, axis=[0, 0, -1],
-        parent_link_from_joint=physics.TransformRT(translation=[0, ROOT_HEIGHT, 0]),
+    sdp.ArticulatedJointParams(
+        name="joint_0", type=sdp.ArticulatedJointType.REVOLUTE, axis=[0, 0, -1],
+        parent_link_from_joint=sdp.TransformRT(translation=[0, ROOT_HEIGHT, 0]),
     ),
-    physics.ArticulatedJointParams(
-        name="joint_1", type=physics.ArticulatedJointType.REVOLUTE, axis=[0, 0, -1],
-        parent_link_from_joint=physics.TransformRT(translation=[0.25, 0.0125, 0.0125]),
+    sdp.ArticulatedJointParams(
+        name="joint_1", type=sdp.ArticulatedJointType.REVOLUTE, axis=[0, 0, -1],
+        parent_link_from_joint=sdp.TransformRT(translation=[0.25, 0.0125, 0.0125]),
     ),
 ]
 params.links = [
-    physics.ArticulatedLinkParams(
+    sdp.ArticulatedLinkParams(
         name="UpperArm", parent_link=-1,
-        parent_joint_from_link=physics.TransformRT(translation=[0, -0.0125, -0.0125]),
-        shape=arm_shape, collider_type=physics.ColliderType.BOX, layer="Pendulum", density=1000.0,
+        parent_joint_from_link=sdp.TransformRT(translation=[0, -0.0125, -0.0125]),
+        shape=arm_shape, collider_type=sdp.ColliderType.BOX, layer="Pendulum", density=1000.0,
     ),
-    physics.ArticulatedLinkParams(
+    sdp.ArticulatedLinkParams(
         name="LowerArm", parent_link=0,
-        parent_joint_from_link=physics.TransformRT(translation=[0, -0.0125, -0.0125]),
-        shape=arm_shape, collider_type=physics.ColliderType.BOX, layer="Pendulum", density=1000.0,
+        parent_joint_from_link=sdp.TransformRT(translation=[0, -0.0125, -0.0125]),
+        shape=arm_shape, collider_type=sdp.ColliderType.BOX, layer="Pendulum", density=1000.0,
     ),
 ]
 
 # Attach the skinned surface. The skin is a colliding contact surface. Two optional tuning
 # knobs (left at defaults here) bound its per-step contact cost: pairing
 # boundary_element_type=P1Q1 with boundary_subsampling reduces contact samples.
-params.skin = physics.ArticulatedSkinParams(shape=skin_shape, layer="Skin")
+params.skin = sdp.ArticulatedSkinParams(shape=skin_shape, layer="Skin")
 articulation = scene.create_articulated_actor(params)
 
 # Seed a chaotic swing so the skin sweeps into the ball.
@@ -101,13 +101,13 @@ for i in range(len(info.link_names)):
 # The skin is a *colliding surface*: surface-node and contact queries apply,
 # while volumetric / soft queries do not.
 for q in [
-    physics.QueryType.SURFACE_NODE_POSITIONS,
-    physics.QueryType.SURFACE_NODE_NORMALS,
-    physics.QueryType.CONTACT_POINTS,
-    physics.QueryType.TOTAL_CONTACT_FORCE,
-    physics.QueryType.NODE_POSITIONS,
-    physics.QueryType.VISUAL_NODE_POSITIONS,
-    physics.QueryType.ELEMENTS_DEFORMATION_GRADIENT,
+    sdp.QueryType.SURFACE_NODE_POSITIONS,
+    sdp.QueryType.SURFACE_NODE_NORMALS,
+    sdp.QueryType.CONTACT_POINTS,
+    sdp.QueryType.TOTAL_CONTACT_FORCE,
+    sdp.QueryType.NODE_POSITIONS,
+    sdp.QueryType.VISUAL_NODE_POSITIONS,
+    sdp.QueryType.ELEMENTS_DEFORMATION_GRADIENT,
 ]:
     print(f"is_query_supported({q}) = {articulation.is_query_supported(q)}")
 # SURFACE_NODE_* and CONTACT_* -> True, others -> False
@@ -121,8 +121,8 @@ Query data is computed during [`scene.step`](pathname:///generated/api/v1.0.0/py
 mesh = articulation.get_surface_mesh()
 print(mesh.get_num_nodes(), mesh.get_num_elements())  # 52 nodes, ~104 triangles
 
-pos_query = articulation.register_query(physics.QueryType.SURFACE_NODE_POSITIONS)
-nrm_query = articulation.register_query(physics.QueryType.SURFACE_NODE_NORMALS)
+pos_query = articulation.register_query(sdp.QueryType.SURFACE_NODE_POSITIONS)
+nrm_query = articulation.register_query(sdp.QueryType.SURFACE_NODE_NORMALS)
 scene.step(TIME_STEP)
 
 positions = np.array(articulation.get_surface_mesh_node_positions_local())
@@ -130,7 +130,7 @@ normals = np.array(articulation.get_surface_mesh_node_normals_local())
 aabb = articulation.get_aabb_world()
 
 # Spatial query on the deformed surface:
-volume = physics.Aabb(min=[0.2, ROOT_HEIGHT-0.05, -0.05], max=[0.55, ROOT_HEIGHT+0.05, 0.05])
+volume = sdp.Aabb(min=[0.2, ROOT_HEIGHT-0.05, -0.05], max=[0.55, ROOT_HEIGHT+0.05, 0.05])
 hits: list[int] = []
 articulation.query_nodes_in_volume_local(volume, True, lambda node, _pos: hits.append(node))
 
@@ -159,8 +159,8 @@ scene.enumerate_contact_layer_names(lambda name: ...)
 During the interactive run the example registers contact queries to report force from the ball:
 
 ```python
-contact_points = articulation.register_query(physics.QueryType.CONTACT_POINTS)
-contact_force = articulation.register_query(physics.QueryType.TOTAL_CONTACT_FORCE)
+contact_points = articulation.register_query(sdp.QueryType.CONTACT_POINTS)
+contact_force = articulation.register_query(sdp.QueryType.TOTAL_CONTACT_FORCE)
 # ... after scene.step():
 force = articulation.get_contact_force_from_actor_world(ball)
 ```
@@ -183,11 +183,11 @@ MOCHI_ERROR_IF_NOT(shape->GetMeshSkinning() != nullptr, ..., "Skin shape must co
 The example demonstrates graceful failure:
 
 ```python
-plain_tri = physics.create_tri_mesh_shape(coordinates=[0,0,0, 1,0,0, 0,1,0], connectivity=[0,1,2])
-params.skin = physics.ArticulatedSkinParams(shape=plain_tri, layer="Skin")
+plain_tri = sdp.create_tri_mesh_shape(coordinates=[0,0,0, 1,0,0, 0,1,0], connectivity=[0,1,2])
+params.skin = sdp.ArticulatedSkinParams(shape=plain_tri, layer="Skin")
 try:
     scene.create_articulated_actor(params)
-except physics.Error:
+except sdp.Error:
     print("non-skinned skin: rejected (as expected)")
 ```
 
@@ -216,7 +216,7 @@ The same scene ships as a declarative [prefab](../../concepts/prefabs.mdx) — t
 
 **Source**: `assets/samples/articulations_skinned_double_pendulum.mochi_scene`
 
-Load it into a fresh scene (or use [`physics.prefab.add_to_scene(...)`](pathname:///generated/api/v1.0.0/python/api/prefab.html#superdex.physics.prefab.add_to_scene) / C++ `prefab::AddToScene(...)` to add it into an existing one):
+Load it into a fresh scene (or use [`sdp.prefab.add_to_scene(...)`](pathname:///generated/api/v1.0.0/python/api/prefab.html#superdex.physics.prefab.add_to_scene) / C++ `prefab::AddToScene(...)` to add it into an existing one):
 
 ```python
 from superdex.physics.utils.scene_helpers import create_scene_from_prefab

@@ -20,10 +20,10 @@ For the underlying mathematical models of soft-actor viscoelasticity and normal 
 To illustrate the effects of physical damping parameters, this scene uses `BDF2` rather than the default `BackwardEuler`.
 
 ```python
-scene = physics.create_scene("Damping Sweep Scene")
+scene = sdp.create_scene("Damping Sweep Scene")
 
 solver_params = scene.get_solver_params()
-solver_params.integration_method = physics.IntegrationMethod.BDF2
+solver_params.integration_method = sdp.IntegrationMethod.BDF2
 scene.set_solver_params(solver_params)
 ```
 
@@ -36,12 +36,12 @@ The ground is a static rigid actor with an infinite half-space geometry. Unlike 
 ```python
 GROUND_NORMAL_DAMPING_COEFFICIENT = 1.0  # [s/m]
 
-plane_shape = physics.create_plane_shape(normal=[0, 1, 0], distance=0)
+plane_shape = sdp.create_plane_shape(normal=[0, 1, 0], distance=0)
 scene.create_rigid_actor(
     name="ground",
     shape=plane_shape,
     is_static=True,
-    contact=physics.ContactParams(
+    contact=sdp.ContactParams(
         normal_viscous_damping_coefficient=GROUND_NORMAL_DAMPING_COEFFICIENT
     ),
 )
@@ -58,7 +58,7 @@ Both the soft and rigid rows of ducks use the same tetrahedral mesh, which is lo
 ```python
 DUCK_SCALE = 0.5
 
-duck_shape = physics.load_shape_from_file(
+duck_shape = sdp.load_shape_from_file(
     file_path=str(resolve_asset("duck/duck_coarse.mochi.h5")),
     bake_scale=[DUCK_SCALE] * 3,
 )
@@ -77,10 +77,10 @@ soft_duck_actors = [
     scene.create_soft_actor(
         name=f"soft_duck_{1e3 * stiffness_damping:g}ms",
         shape=duck_shape,
-        world_from_local=physics.TransformRT(
+        world_from_local=sdp.TransformRT(
             translation=[_column_x(index, num_columns), DROP_HEIGHT, SOFT_ROW_Z]
         ),
-        material=physics.SoftMaterialParams(
+        material=sdp.SoftMaterialParams(
             stiffness_damping_coefficient=stiffness_damping
         ),
     )
@@ -102,10 +102,10 @@ rigid_duck_actors = [
     scene.create_rigid_actor(
         name=f"rigid_duck_{effective_damping:g}spm",
         shape=duck_shape,
-        world_from_local=physics.TransformRT(
+        world_from_local=sdp.TransformRT(
             translation=[_column_x(index, num_columns), DROP_HEIGHT, RIGID_ROW_Z]
         ),
-        contact=physics.ContactParams(
+        contact=sdp.ContactParams(
             normal_viscous_damping_coefficient=(
                 effective_damping**2 / GROUND_NORMAL_DAMPING_COEFFICIENT
             )
@@ -124,17 +124,17 @@ The simulation advances with a fixed 1/300 s time step, which is small enough th
 ```python
 TIME_STEP = 1.0 / 300.0  # [s]
 
-physics.initialize(num_worker_threads=-1)
+sdp.initialize(num_worker_threads=-1)
 scene, _, _ = create_damping_sweep_simulation()
 
-if not physics.debugger.attach():
-    physics.shutdown()
+if not sdp.debugger.attach():
+    sdp.shutdown()
     return
 
-while physics.debugger.is_attached():
+while sdp.debugger.is_attached():
     scene.step(TIME_STEP)
 
-physics.shutdown()
+sdp.shutdown()
 ```
 
 The energy from the impact is transferred to vibrational modes of the soft actors, which are damped to differing degrees, with vibrations continuing longer in the less-damped actors.  Because the contact forces on rigid actors are not directly aligned with their centers of mass, they do not bounce back with a pure linear translation (as in the most elementary interpretation of coefficients of restitution in particle dynamics).  Some energy is instead transferred into rotational modes, leading to chattering with the ground, which is again damped out to differing degrees, persisting longer in actors with less normal viscous contact damping.

@@ -33,8 +33,8 @@ The example demonstrates three tracking configurations in one continuous simulat
 The example creates a scene, loads the Plain articulation prefab, and selects its articulated actor. The prefab also adds the ground plane and ball used by the example.
 
 ```python
-scene = physics.create_scene("Articulations Pose Controller Scene")
-result = physics.prefab.add_to_scene(
+scene = sdp.create_scene("Articulations Pose Controller Scene")
+result = sdp.prefab.add_to_scene(
     prefab_path=str(
         resolve_asset("samples/articulations_double_pendulum_on_rail.mochi_scene")
     ),
@@ -47,7 +47,7 @@ result = physics.prefab.add_to_scene(
 )
 articulation = next(
     actor
-    for actor in result.filter(physics.ActorType.ARTICULATED)
+    for actor in result.filter(sdp.ActorType.ARTICULATED)
     if actor.get_name() == ARTICULATION_NAME
 )
 ```
@@ -57,24 +57,24 @@ articulation = next(
 [`PoseControllerParams(num_links)`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.PoseControllerParams) creates three link-indexed arrays initialized with zero stiffness and damping. Entry `i` configures link `i` or its inbound joint.
 
 ```python
-params = physics.PoseControllerParams(NUM_LINKS)
+params = sdp.PoseControllerParams(NUM_LINKS)
 
 # The rail is prismatic (linear units) and the upper hinge revolute (angular
 # units), so each needs its own gain pair.
-params.joint_tracking[CART_LINK] = physics.PoseTrackingParams(
+params.joint_tracking[CART_LINK] = sdp.PoseTrackingParams(
     stiffness=125.0,   # [N/m]
     damping=8.8,       # [N*s/m]
 )
-params.joint_tracking[UPPER_ARM_LINK] = physics.PoseTrackingParams(
+params.joint_tracking[UPPER_ARM_LINK] = sdp.PoseTrackingParams(
     stiffness=31.25,   # [N*m/rad]
     damping=2.2,       # [N*m*s/rad]
 )
 
-params.link_pos_tracking[END_EFFECTOR_LINK] = physics.PoseTrackingParams(
+params.link_pos_tracking[END_EFFECTOR_LINK] = sdp.PoseTrackingParams(
     stiffness=75.0,
     damping=5.3,
 )
-params.link_rot_tracking[END_EFFECTOR_LINK] = physics.PoseTrackingParams(
+params.link_rot_tracking[END_EFFECTOR_LINK] = sdp.PoseTrackingParams(
     stiffness=1.56,
     damping=0.22,
 )
@@ -87,13 +87,13 @@ The [`joint_tracking`](pathname:///generated/api/v1.0.0/python/api/physics.html#
 A default [`PoseTrackingParams`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.PoseTrackingParams) has zero stiffness and damping, which disables that tracking entry. To switch modes, the example constructs a complete parameter set and replaces the controller parameters:
 
 ```python
-def set_joint_only_controller(articulation: physics.Actor) -> None:
-    params = physics.PoseControllerParams(NUM_LINKS)
-    params.joint_tracking[CART_LINK] = physics.PoseTrackingParams(
+def set_joint_only_controller(articulation: sdp.Actor) -> None:
+    params = sdp.PoseControllerParams(NUM_LINKS)
+    params.joint_tracking[CART_LINK] = sdp.PoseTrackingParams(
         stiffness=125.0,
         damping=8.8,
     )
-    params.joint_tracking[UPPER_ARM_LINK] = physics.PoseTrackingParams(
+    params.joint_tracking[UPPER_ARM_LINK] = sdp.PoseTrackingParams(
         stiffness=31.25,
         damping=2.2,
     )
@@ -136,7 +136,7 @@ scene.step(TIME_STEP)
 Link-space targets contain one world transform per link, even when only one link has non-zero tracking gains. They are converted internally to a feasible joint target for any active joint tracking; supplying link transforms does not imply that only link tracking is active. At the handoff to link-only mode, the example reads all current link transforms and preserves them as the circle center:
 
 ```python
-circle_center_transforms = physics.DynamicArrayTransformRT(NUM_LINKS)
+circle_center_transforms = sdp.DynamicArrayTransformRT(NUM_LINKS)
 articulation.get_articulated_link_transforms(
     out_world_from_links=circle_center_transforms
 )
@@ -160,7 +160,7 @@ Controller generalized force is computed on demand. Register the query before st
 
 ```python
 query = articulation.register_query(
-    physics.QueryType.ARTICULATED_CONTROLLER_FORCE
+    sdp.QueryType.ARTICULATED_CONTROLLER_FORCE
 )
 
 scene.step(TIME_STEP)

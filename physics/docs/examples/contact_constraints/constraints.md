@@ -29,7 +29,7 @@ Both constraints share the same spring-damper parameters. The pivot pins a local
 
 ```python
 pivot = scene.create_rigid_pivot_position_constraint(
-    physics.RigidPivotPositionConstraintParams(
+    sdp.RigidPivotPositionConstraintParams(
         actor=link1.get_handle(),
         local_position=[0, 0.0125, 0.0125],
         target_position=[0, 0.5, 0],   # the world anchor
@@ -40,7 +40,7 @@ pivot = scene.create_rigid_pivot_position_constraint(
 )
 
 spherical = scene.create_rigid_spherical_joint_constraint(
-    physics.RigidSphericalJointConstraintParams(
+    sdp.RigidSphericalJointConstraintParams(
         actor_a=link1.get_handle(),
         actor_b=link2.get_handle(),
         local_pos_a=[0.25, 0.0125, 0.0125],   # Link1 far end
@@ -90,7 +90,7 @@ constraint.set_saturation(saturation=constraint.get_saturation())
 [`get_deviation`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Constraint.get_deviation) returns the current constraint error and needs no setup. [`get_force`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Constraint.get_force) requires a `CONSTRAINT_FORCE` query registered **before** stepping:
 
 ```python
-pivot.register_query(physics.QueryType.CONSTRAINT_FORCE)   # once, before stepping
+pivot.register_query(sdp.QueryType.CONSTRAINT_FORCE)   # once, before stepping
 # ... inside the loop, after scene.step(dt):
 deviation = pivot.get_deviation()                        # position error [m]
 force = pivot.get_force()                                # generalized force
@@ -105,15 +105,15 @@ Setting the pivot's target every step animates the anchor along a small circle,
 turning the fixed pendulum base into a moving one:
 
 ```python
-pivot.set_target_position(physics.Real3(x, y, z))
+pivot.set_target_position(sdp.Real3(x, y, z))
 ```
 
 Only target-bearing constraints support this. Calling [`set_target_position`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Constraint.set_target_position) on the spherical joint (which has no position target) raises a graceful error — the interface is uniform, but capabilities are type-specific:
 
 ```python
 try:
-    spherical.set_target_position(physics.Real3(0, 0.5, 0))
-except physics.Error:
+    spherical.set_target_position(sdp.Real3(0, 0.5, 0))
+except sdp.Error:
     pass  # not supported for a spherical joint
 ```
 
@@ -149,7 +149,7 @@ The same scene ships as a declarative [prefab](../../concepts/prefabs.mdx) — t
 
 **Source**: `assets/samples/constraints_double_pendulum.mochi_scene`
 
-Load it into a fresh scene (or use [`physics.prefab.add_to_scene(...)`](pathname:///generated/api/v1.0.0/python/api/prefab.html#superdex.physics.prefab.add_to_scene) / C++ `prefab::AddToScene(...)` to add it into an existing one):
+Load it into a fresh scene (or use [`sdp.prefab.add_to_scene(...)`](pathname:///generated/api/v1.0.0/python/api/prefab.html#superdex.physics.prefab.add_to_scene) / C++ `prefab::AddToScene(...)` to add it into an existing one):
 
 ```python
 from superdex.physics.utils.scene_helpers import create_scene_from_prefab

@@ -27,7 +27,7 @@ The returned handle is owned by, and can be restored only into, the scene that c
 The simulation steps at 60 Hz while the Debugger is attached. When scene time reaches three seconds, restoring the initial checkpoint resets the duck and the captured scene time:
 
 ```python
-while physics.debugger.is_attached():
+while sdp.debugger.is_attached():
     scene.step(TIME_STEP)
     if scene.get_total_simulation_time() >= RESTORE_INTERVAL:
         scene.restore_state(initial_state, release_immediately=False)
@@ -49,7 +49,7 @@ This example shuts down the physics context immediately on exit, which destroys 
 try:
     ...
 finally:
-    physics.shutdown()
+    sdp.shutdown()
 ```
 
 ## What to Expect

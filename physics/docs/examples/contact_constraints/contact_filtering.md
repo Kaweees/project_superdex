@@ -25,7 +25,7 @@ platform_1 = scene.create_rigid_actor(
     layer="layer_1",
     shape=platform_shape,
     is_static=True,
-    world_from_local=physics.TransformRT(translation=[0, 0.5, 0]),
+    world_from_local=sdp.TransformRT(translation=[0, 0.5, 0]),
 )
 
 platform_2 = scene.create_rigid_actor(
@@ -33,7 +33,7 @@ platform_2 = scene.create_rigid_actor(
     layer="layer_2",
     shape=platform_shape,
     is_static=True,
-    world_from_local=physics.TransformRT(translation=[0, 0, 0]),
+    world_from_local=sdp.TransformRT(translation=[0, 0, 0]),
 )
 ```
 
@@ -56,7 +56,7 @@ scene.enable_actor_contact_symmetric(
     cubes["bottom_cube_2"].get_handle(),
     cubes["middle_cube_2"].get_handle(),
     enable=False,
-    include_nested_actors=physics.IncludeNestedActors.NO,
+    include_nested_actors=sdp.IncludeNestedActors.NO,
 )
 ```
 

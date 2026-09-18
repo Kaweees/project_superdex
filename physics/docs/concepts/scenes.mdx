@@ -33,17 +33,17 @@ int main() {
 <TabItem value="python" label="Python">
 
 ```python
-import superdex.physics as physics
+import superdex.physics as sdp
 
-physics.initialize(num_worker_threads=-1)
+sdp.initialize(num_worker_threads=-1)
 try:
-    scene = physics.create_scene("training environment")
+    scene = sdp.create_scene("training environment")
 
     # Create actors and constraints, then step the scene.
 
-    physics.destroy_scene(scene)
+    sdp.destroy_scene(scene)
 finally:
-    physics.shutdown()
+    sdp.shutdown()
 ```
 
 </TabItem>

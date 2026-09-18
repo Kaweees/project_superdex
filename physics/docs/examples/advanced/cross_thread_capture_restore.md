@@ -21,7 +21,7 @@ The parent creates the source scene before attaching the Debugger. It captures i
 source_scene, _ = create_simulation(
     "Cross-Thread Capture/Restore Source"
 )
-state_buffer = physics.DynamicArrayUint8()
+state_buffer = sdp.DynamicArrayUint8()
 source_scene.capture_state_to_bytes(state_buffer)
 state_bytes = bytes(state_buffer)
 ```
@@ -71,7 +71,7 @@ On normal completion, each worker creates, restores, steps, and destroys its des
 def _repeat_rollout(name, state_bytes, time_scale, stop):
     scene, articulation = create_simulation(name)
     scene.restore_state_from_bytes(state_bytes)
-    while not stop.is_set() and physics.debugger.is_attached():
+    while not stop.is_set() and sdp.debugger.is_attached():
         for _ in range(ROLLOUT_STEPS):
             joint_target = joint_kick_target(
                 scene.get_total_simulation_time(), time_scale
@@ -79,7 +79,7 @@ def _repeat_rollout(name, state_bytes, time_scale, stop):
             articulation.set_articulated_target_pose(pose=joint_target)
             scene.step(TIME_STEP)
         scene.restore_state_from_bytes(state_bytes)
-    physics.destroy_scene(scene)
+    sdp.destroy_scene(scene)
 ```
 
 `ROLLOUT_STEPS` is derived from the five-second motion duration and the simulation time step. Both branches share it, so the double-speed kick finishes early and holds its final pose until the shared reset. Restore resets both the articulation state and scene time, so the same trajectory begins again naturally; each repetition is not a new candidate rollout.
@@ -107,12 +107,12 @@ with ThreadPoolExecutor(max_workers=2) as executor:
     for worker in workers:
         worker.result()
 
-physics.destroy_scene(source_scene)
+sdp.destroy_scene(source_scene)
 ```
 
 On normal completion, each worker destroys its destination scene after its loop ends. Futures propagate worker exceptions to the parent. If attachment fails, the example raises before creating an executor or starting workers. If one persistent worker fails after attachment, the parent sets the shared stop event and stops the Debugger server before joining. Stopping the server is what releases a sibling that is parked inside a paused [`scene.step()`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Scene.step): that wait has no timeout, and the stop event alone is only checked between steps, so the join would otherwise hang.
 
-For clarity, this example does not guard every partially completed setup or rollout operation with cleanup handlers. Production code should use `finally` blocks to destroy worker-owned scenes on their owning threads and to call [`physics.shutdown()`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.shutdown) when setup or worker execution raises; context shutdown or normal interpreter exit otherwise reclaims remaining scenes.
+For clarity, this example does not guard every partially completed setup or rollout operation with cleanup handlers. Production code should use `finally` blocks to destroy worker-owned scenes on their owning threads and to call [`sdp.shutdown()`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.shutdown) when setup or worker execution raises; context shutdown or normal interpreter exit otherwise reclaims remaining scenes.
 
 ## Features
 
@@ -129,4 +129,4 @@ For clarity, this example does not guard every partially completed setup or roll
 uv run examples/example_cross_thread_capture_restore.py
 ```
 
-The script captures the source scene, then calls [`physics.debugger.attach()`](pathname:///generated/api/v1.0.0/python/api/debugger.html#superdex.physics.debugger.attach), which launches or focuses the SuperDex Physics Debugger and waits for a connection. The stationary source is selected initially, and the two rollout scenes start after attachment. Press Play once, then switch to either rollout to see both trajectories advance; each resets every five seconds. Closing or disconnecting the Debugger normally ends the loops and cleans up all three scenes. See [Inspecting Scenes](../../debugging_scenes.md) for debugger connection, navigation, and playback controls.
+The script captures the source scene, then calls [`sdp.debugger.attach()`](pathname:///generated/api/v1.0.0/python/api/debugger.html#superdex.physics.debugger.attach), which launches or focuses the SuperDex Physics Debugger and waits for a connection. The stationary source is selected initially, and the two rollout scenes start after attachment. Press Play once, then switch to either rollout to see both trajectories advance; each resets every five seconds. Closing or disconnecting the Debugger normally ends the loops and cleans up all three scenes. See [Inspecting Scenes](../../debugging_scenes.md) for debugger connection, navigation, and playback controls.

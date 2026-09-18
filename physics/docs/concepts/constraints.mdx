@@ -466,11 +466,11 @@ constraint = scene.create_deformable_node_to_rigid_constraint(
 
 ## Working with Constraints at Runtime
 
-The [Constraint Types](#constraint-types) above describe how to *define* a constraint at creation time. Every [`Constraint`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Constraint.html) also exposes a **uniform runtime interface**: the same methods work on all types, but many are type-specific and report a graceful [`Error`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Error.html) (in Python, methods on [`Constraint`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Constraint) raise [`mochi.Error`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Error)) when they don't apply. The [constraints](../examples/contact_constraints/constraints.md) page tours this whole interface as a worked example.
+The [Constraint Types](#constraint-types) above describe how to *define* a constraint at creation time. Every [`Constraint`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Constraint.html) also exposes a **uniform runtime interface**: the same methods work on all types, but many are type-specific and report a graceful [`Error`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Error.html) (in Python, methods on [`Constraint`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Constraint) raise [`sdp.Error`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Error)) when they don't apply. The [constraints](../examples/contact_constraints/constraints.md) page tours this whole interface as a worked example.
 
 ### Lifecycle and Identity
 
-C++ [`Scene`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Scene.html) constraint factory methods return a `Constraint*` and a stable [`ConstraintHandle`](pathname:///generated/api/v1.0.0/cpp/structsuperdex_1_1ConstraintHandle.html). Look a constraint back up with [`GetConstraint`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Scene.html), iterate all of them with [`ForEachConstraint`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Scene.html), and remove one with [`DestroyConstraint`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Scene.html) (by pointer or handle). Python provides the corresponding [`get_constraint`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Scene.get_constraint), [`for_each_constraint`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Scene.for_each_constraint), and [`destroy_constraint`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Scene.destroy_constraint) methods. A constraint is **auto-destroyed** when any actor it references is destroyed.
+C++ [`Scene`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Scene.html) constraint factory methods return a `Constraint*` and a stable [`ConstraintHandle`](pathname:///generated/api/v1.0.0/cpp/structsuperdex_1_1ConstraintHandle.html). Look a constraint back up with [`GetConstraint`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Scene.html), iterate all of them with [`ForEachConstraint`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Scene.html), and remove one with [`DestroyConstraint`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Scene.html) (by pointer or handle). Python provides the corresponding [`get_constraint`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Scene.get_constraint), [`for_each_constraint`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Scene.for_each_constraint), and [`destroy_constraint`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Scene.destroy_constraint) methods. Direct removal applies only to constraints created through scene factory methods; automatically created joint-limit, cycle-joint, and pose-controller constraints are removed with the corresponding actor feature, if supported, or when the actor is destroyed. A constraint is **auto-destroyed** when any actor it references is destroyed.
 
 <Tabs groupId="language">
 <TabItem value="cpp" label="C++" default>
@@ -479,7 +479,7 @@ C++ [`Scene`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Scene.html) 
 ConstraintHandle handle = constraint->GetHandle();
 Constraint* same = scene->GetConstraint(handle);      // look up by handle
 scene->ForEachConstraint([](Constraint* c) { /* ... */ });  // enumerate
-scene->DestroyConstraint(handle);                     // explicit removal
+scene->DestroyConstraint(handle);                     // remove a scene-created constraint
 // scene->DestroyActor(actorHandle) also removes every constraint on that actor
 ```
 
@@ -490,7 +490,7 @@ scene->DestroyConstraint(handle);                     // explicit removal
 handle = constraint.get_handle()
 same = scene.get_constraint(handle)            # look up by handle
 scene.for_each_constraint(lambda c: ...)       # enumerate
-scene.destroy_constraint(handle)               # explicit removal
+scene.destroy_constraint(handle)               # remove a scene-created constraint
 # scene.destroy_actor(actor_handle) also removes every constraint on that actor
 ```
 
@@ -570,7 +570,7 @@ pivot->SetTargetPosition(Real3{x, y, z}, error);  // RigidPivotPosition
 <TabItem value="python" label="Python">
 
 ```python
-pivot.set_target_position(mochi.Real3(x, y, z))  # RigidPivotPosition
+pivot.set_target_position(sdp.Real3(x, y, z))  # RigidPivotPosition
 # set_target_rotation / set_target_dof apply to rotation- / DoF-target constraints
 ```
 
@@ -595,7 +595,7 @@ Span<real const> force = constraint->GetForce(error);          // needs the quer
 <TabItem value="python" label="Python">
 
 ```python
-constraint.register_query(mochi.QueryType.CONSTRAINT_FORCE)  # once, before stepping
+constraint.register_query(sdp.QueryType.CONSTRAINT_FORCE)  # once, before stepping
 scene.step(dt)
 deviation = constraint.get_deviation()   # constraint value g
 force = constraint.get_force()            # needs the query above

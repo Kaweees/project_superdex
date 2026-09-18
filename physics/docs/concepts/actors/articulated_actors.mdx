@@ -113,25 +113,24 @@ Actor* actor = scene->CreateArticulatedActor(params, error);
 <TabItem value="python" label="Python">
 
 ```python
-import mochi
-
+import superdex.physics as sdp
 # A 2-link arm: Free root + Revolute child (hinge about Z).
-params = mochi.ArticulatedActorParams(name="arm")
-params.world_from_root = mochi.TransformRT(translation=[0, 0.2, 0])
+params = sdp.ArticulatedActorParams(name="arm")
+params.world_from_root = sdp.TransformRT(translation=[0, 0.2, 0])
 params.joints = [
-    mochi.ArticulatedJointParams(type=mochi.ArticulatedJointType.FREE),
-    mochi.ArticulatedJointParams(
-        type=mochi.ArticulatedJointType.REVOLUTE,
-        parent_link_from_joint=mochi.TransformRT(translation=[0.1, 0, 0]),
+    sdp.ArticulatedJointParams(type=sdp.ArticulatedJointType.FREE),
+    sdp.ArticulatedJointParams(
+        type=sdp.ArticulatedJointType.REVOLUTE,
+        parent_link_from_joint=sdp.TransformRT(translation=[0.1, 0, 0]),
         axis=[0, 0, 1],
     ),
 ]
 params.links = [
-    mochi.ArticulatedLinkParams(
-        parent_link=-1, shape=root_shape, collider_type=mochi.ColliderType.BOX, density=1000.0
+    sdp.ArticulatedLinkParams(
+        parent_link=-1, shape=root_shape, collider_type=sdp.ColliderType.BOX, density=1000.0
     ),
-    mochi.ArticulatedLinkParams(
-        parent_link=0, shape=child_shape, collider_type=mochi.ColliderType.BOX, density=1000.0
+    sdp.ArticulatedLinkParams(
+        parent_link=0, shape=child_shape, collider_type=sdp.ColliderType.BOX, density=1000.0
     ),
 ]
 
@@ -144,7 +143,7 @@ actor = scene.create_articulated_actor(params)
 Each link becomes a queryable rigid **sub-actor** named `"actorName/linkName"`; retrieve them with [`GetNestedLinkActors`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Actor.html) / [`get_nested_link_actors`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Actor.get_nested_link_actors).
 
 :::tip Declarative alternative
-Scenes — including articulated actors and URDF-imported skeletons — can also be authored declaratively as [prefabs](../prefabs.mdx) (`.mochi_scene` JSON) and loaded with `prefab::AddToScene` / [`mochi.prefab.add_to_scene`](pathname:///generated/api/v1.0.0/python/api/prefab.html#superdex.physics.prefab.add_to_scene).
+Scenes — including articulated actors and URDF-imported skeletons — can also be authored declaratively as [prefabs](../prefabs.mdx) (`.mochi_scene` JSON) and loaded with `prefab::AddToScene` / [`sdp.prefab.add_to_scene`](pathname:///generated/api/v1.0.0/python/api/prefab.html#superdex.physics.prefab.add_to_scene).
 :::
 
 ## ArticulatedJointParams Reference
@@ -292,22 +291,22 @@ params.cycles = {
 <TabItem value="python" label="Python">
 
 ```python
-params = mochi.ArticulatedActorParams()
+params = sdp.ArticulatedActorParams()
 # 4 revolute-jointed links forming an open chain ...
 params.joints = [
-    mochi.ArticulatedJointParams(type=mochi.ArticulatedJointType.REVOLUTE, axis=[0, 0, 1])
+    sdp.ArticulatedJointParams(type=sdp.ArticulatedJointType.REVOLUTE, axis=[0, 0, 1])
     for _ in range(4)
 ]
 params.links = [
-    mochi.ArticulatedLinkParams(parent_link=i - 1, shape=bar_shape, density=1000.0)
+    sdp.ArticulatedLinkParams(parent_link=i - 1, shape=bar_shape, density=1000.0)
     for i in range(4)
 ]
 # ... closed into a loop by tying link 3 back to link 0.
 params.cycles = [
-    mochi.ArticulatedCycleJointParams(
+    sdp.ArticulatedCycleJointParams(
         parent_link=0,
         child_link=3,
-        joint_from_child_link=mochi.TransformRT(translation=[0.1, 0, 0]),
+        joint_from_child_link=sdp.TransformRT(translation=[0.1, 0, 0]),
     )
 ]
 ```
@@ -345,9 +344,9 @@ Actor* actor = scene->CreateArticulatedActor(params, error);
 <TabItem value="python" label="Python">
 
 ```python
-params = mochi.ArticulatedActorParams()
+params = sdp.ArticulatedActorParams()
 # ... joints and links as above ...
-params.skin = mochi.ArticulatedSkinParams(
+params.skin = sdp.ArticulatedSkinParams(
     shape=skin_shape,   # a triangle-mesh shape with skinning weights and indices
     layer="Skin",
 )
@@ -452,11 +451,11 @@ actor->GetArticulatedJointVelocities(velocities, error);
 <TabItem value="python" label="Python">
 
 ```python
-pose = mochi.DynamicArrayReal(actor.get_num_dofs())
+pose = sdp.DynamicArrayReal(actor.get_num_dofs())
 actor.get_articulated_pose(pose)
-transforms = mochi.DynamicArrayTransformRT(len(actor.get_nested_link_actors()))
+transforms = sdp.DynamicArrayTransformRT(len(actor.get_nested_link_actors()))
 actor.get_articulated_link_transforms(transforms)
-velocities = mochi.DynamicArrayReal(actor.get_num_dofs())
+velocities = sdp.DynamicArrayReal(actor.get_num_dofs())
 actor.get_articulated_joint_velocities(velocities)
 ```
 
@@ -575,7 +574,7 @@ scene.enable_actor_contact_symmetric(
     link_handle,
     ball_handle,
     enable=True,
-    include_nested_actors=mochi.IncludeNestedActors.NO,
+    include_nested_actors=sdp.IncludeNestedActors.NO,
 )
 enabled = scene.is_layer_contact_enabled("EndEffector", "Ball")
 num_layers = scene.get_num_contact_layers()

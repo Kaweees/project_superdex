@@ -24,11 +24,11 @@ This example sets non-default solver parameters, which is often necessary to att
 The loss of accuracy from limiting nonlinear solver iterations can be partially compensated by using the strong Wolfe line search, which is empirically effective for improving solution quality in deformable actors when there is a limited iteration budget.
 
 ```python
-scene = physics.create_scene("T-shirt on Plane Scene")
+scene = sdp.create_scene("T-shirt on Plane Scene")
 
 solver_params = scene.get_solver_params()
 solver_params.non_linear_solver.max_iter = 2
-solver_params.non_linear_solver.line_search_type = physics.LineSearchType.WOLFE_STRONG
+solver_params.non_linear_solver.line_search_type = sdp.LineSearchType.WOLFE_STRONG
 solver_params.experimental_eval.implicit_normal_force_for_dissipation = True
 scene.set_solver_params(solver_params)
 ```
@@ -37,12 +37,12 @@ The current normal load is used for dissipation because it improves the accuracy
 This is technically inconsistent with the mathematical assumptions behind the `WOLFE_STRONG` line search, because contact dissipation with an implicit normal force does not derive exactly from an incremental potential.
 However, the potential-based line search nonetheless improves convergence in spite of this inconsistency, since most terms of the formulation do derive from a potential.
 
-This example uses the default linear solver, but using the experimental [`physics.LinearSolverType.PARALLEL_CG`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.LinearSolverType) linear solver can improve performance even further in applications where strict bit-level determinism is not required and a suitable multi-core environment is available.
+This example uses the default linear solver, but using the experimental [`sdp.LinearSolverType.PARALLEL_CG`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.LinearSolverType) linear solver can improve performance even further in applications where strict bit-level determinism is not required and a suitable multi-core environment is available.
 
 The ground plane that the T-shirt falls onto is modeled as a static rigid actor with an infinite half-space geometry.
 
 ```python
-plane_shape = physics.create_plane_shape(normal=[0, 1, 0], distance=0)
+plane_shape = sdp.create_plane_shape(normal=[0, 1, 0], distance=0)
 rigid_plane_actor = scene.create_rigid_actor(
     name="ground", shape=plane_shape, is_static=True
 )
@@ -54,7 +54,7 @@ Shell actors use surface triangle meshes rather than the tetrahedral volume mesh
 
 ```python
 shape_path = str(resolve_asset("garments/tshirt_visual_subdiv_2.mochi.h5"))
-shape = physics.load_shape_from_file(shape_path)
+shape = sdp.load_shape_from_file(shape_path)
 ```
 
 This example uses a preprepared model asset for brevity. The [Authoring Assets](../../authoring_scenes/authoring_assets.mdx) workflow shows how to load an OBJ physics mesh into [`ModelData`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.ModelData), validate it, and save it in HDF5 format. (That path does not create the optional subdivided visual mesh included in this example's asset.)
@@ -69,7 +69,7 @@ POISSON_RATIO = 0.25
 DENSITY = 1e3  # [kg/m^3]
 THICKNESS = 2e-3  # [m]
 
-material = physics.experimental.shell_material_params_from3d_isotropic(
+material = sdp.experimental.shell_material_params_from3d_isotropic(
     YOUNGS_MODULUS, POISSON_RATIO, DENSITY, THICKNESS
 )
 ```
@@ -87,18 +87,18 @@ INITIAL_X_TRANSLATION = -0.5  # [m]
 INITIAL_HEIGHT = 0.1  # [m]
 CONTACT_RADIUS = 1.5e-2  # [m]
 
-shell_params = physics.experimental.ShellActorParams(
+shell_params = sdp.experimental.ShellActorParams(
     name="T-shirt",
     shape=shape,
     material=material,
-    world_from_local=physics.TransformRT(
+    world_from_local=sdp.TransformRT(
         translation=[INITIAL_X_TRANSLATION, INITIAL_HEIGHT, 0]
     ),
 )
 shell_params.point_cloud_collider.radius = CONTACT_RADIUS
 shell_params.point_cloud_collider.self_contact = True
 
-shell_actor = physics.experimental.create_shell_actor(scene, shell_params)
+shell_actor = sdp.experimental.create_shell_actor(scene, shell_params)
 ```
 
 The contact radius controls the interaction range. While it corresponds, in principle, to the thickness of the shell in the context of self-contact, it is typically chosen significantly larger than the shell's physical thickness.
@@ -119,17 +119,17 @@ The example is initialized with a hardware-derived worker count to take advantag
 ```python
 TIME_STEP = 1.0 / 60.0  # [s]
 
-physics.initialize(num_worker_threads=-1)
+sdp.initialize(num_worker_threads=-1)
 scene, _, _ = create_tshirt_on_plane_simulation()
 
-if not physics.debugger.attach():
-    physics.shutdown()
+if not sdp.debugger.attach():
+    sdp.shutdown()
     return
 
-while physics.debugger.is_attached():
+while sdp.debugger.is_attached():
     scene.step(TIME_STEP)
 
-physics.shutdown()
+sdp.shutdown()
 ```
 
 For simplicity, this example does not adjust step size dynamically to synchronize simulation time with wall-clock time. However, optimized builds can be expected to run within a moderate factor of real time on modern multi-core CPUs.

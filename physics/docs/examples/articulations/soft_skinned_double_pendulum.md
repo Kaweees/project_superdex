@@ -37,26 +37,26 @@ ROOT_HEIGHT = 0.5  # [m]
 ARM_SCALE = [0.25, 0.025, 0.025]  # [m]
 SECOND_ARM_SCALE = [0.125, 0.025, 0.025]  # [m]
 
-arm_shape = physics.load_shape_from_file(
+arm_shape = sdp.load_shape_from_file(
     file_path=str(resolve_asset("cube/cube_fine_mesh.mochi.json")),
     bake_scale=ARM_SCALE,
 )
-second_arm_shape = physics.load_shape_from_file(
+second_arm_shape = sdp.load_shape_from_file(
     file_path=str(resolve_asset("cube/cube_fine_mesh.mochi.json")),
     bake_scale=SECOND_ARM_SCALE,
 )
 
 # Soft volume X=0.375..0.475, Y/Z 0..0.025 (center 0.0125 = w/2) with constrainedNodes=[0,1,2,3] at attachment end
-soft_shape = physics.load_shape_from_file(
+soft_shape = sdp.load_shape_from_file(
     file_path=str(resolve_asset("samples/articulations_parts/soft.mochi.json")),
     bake_scale=[1, 1, 1],
 )
 
-skeleton_params = physics.ArticulatedActorParams(name="SoftSkinnedDoublePendulum")
+skeleton_params = sdp.ArticulatedActorParams(name="SoftSkinnedDoublePendulum")
 skeleton_params.joints = _make_joints()  # joint_0 at [0,ROOT_HEIGHT,0], joint_1 at [0.25,0.0125,0.0125]
 skeleton_params.links = _make_links(arm_shape, second_arm_shape)
 
-soft_params = physics.SoftActorParams(
+soft_params = sdp.SoftActorParams(
     name="SoftArm",
     shape=soft_shape,
     layer="Soft",
@@ -64,12 +64,12 @@ soft_params = physics.SoftActorParams(
     has_inertia=False,
     has_stress=True,     # unposed elasticity, accurate for rigid attachment
 )
-soft_params.material = physics.SoftMaterialParams()
-soft_params.material.type = physics.SoftMaterialType.NEO_HOOKEAN
+soft_params.material = sdp.SoftMaterialParams()
+soft_params.material.type = sdp.SoftMaterialType.NEO_HOOKEAN
 soft_params.material.neo_hookean.youngs_modulus = 1.5e4  # softer
 soft_params.material.density = 500.0
 
-ss_params = physics.SoftSkinnedActorParams(
+ss_params = sdp.SoftSkinnedActorParams(
     skeleton_params=skeleton_params,
     soft_params=[soft_params],
     soft_attach_links=["LowerArm"],
@@ -122,10 +122,10 @@ the articulated actor:
 
 ```python
 for q in [
-    physics.QueryType.SURFACE_NODE_POSITIONS,
-    physics.QueryType.CONTACT_POINTS,
-    physics.QueryType.TOTAL_CONTACT_FORCE,
-    physics.QueryType.NODE_POSITIONS,
+    sdp.QueryType.SURFACE_NODE_POSITIONS,
+    sdp.QueryType.CONTACT_POINTS,
+    sdp.QueryType.TOTAL_CONTACT_FORCE,
+    sdp.QueryType.NODE_POSITIONS,
 ]:
     print(f"top-level articulated actor is_query_supported({q}) = {actor.is_query_supported(q)}")
     soft_actor = scene.get_actor(soft_handles[0])
@@ -148,7 +148,7 @@ print(aabb.min, aabb.max)
 Node positions, by contrast, are query data computed during [`scene.step`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.Scene.step), so register on the nested soft actor, step, then read back:
 
 ```python
-pos_query = soft_actor.register_query(physics.QueryType.NODE_POSITIONS)
+pos_query = soft_actor.register_query(sdp.QueryType.NODE_POSITIONS)
 scene.step(TIME_STEP)
 
 # Deformed node positions computed during the step (3 values per node).
@@ -175,8 +175,8 @@ During interactive run the example registers contact queries on the nested soft 
 
 ```python
 soft_actor = scene.get_actor(actor.get_nested_soft_actors()[0])
-contact_points = soft_actor.register_query(physics.QueryType.CONTACT_POINTS)
-contact_force = soft_actor.register_query(physics.QueryType.TOTAL_CONTACT_FORCE)
+contact_points = soft_actor.register_query(sdp.QueryType.CONTACT_POINTS)
+contact_force = soft_actor.register_query(sdp.QueryType.TOTAL_CONTACT_FORCE)
 # ... after scene.step():
 force = soft_actor.get_contact_force_from_actor_world(ball)
 ```

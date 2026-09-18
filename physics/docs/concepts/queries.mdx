@@ -36,7 +36,7 @@ actor->CancelQuery(query);
 <TabItem value="python" label="Python">
 
 ```python
-query = actor.register_query(type=mochi.QueryType.NODE_POSITIONS)
+query = actor.register_query(type=sdp.QueryType.NODE_POSITIONS)
 scene.step(time_step_sec)
 positions = actor.get_node_positions_local()
 # Use or copy positions before cancelling the query.

@@ -173,13 +173,13 @@ experimental::SetTransmissionActuatorStateVariables(
 <TabItem value="python" label="Python">
 
 ```python
-transmission_index = mochi.experimental.add_linear_transmission(
+transmission_index = sdp.experimental.add_linear_transmission(
     articulated_actor, tendon_params
 )
-mochi.experimental.attach_displacement_control_actuator(
+sdp.experimental.attach_displacement_control_actuator(
     articulated_actor, transmission_index, actuator_params
 )
-mochi.experimental.set_transmission_actuator_state_variables(
+sdp.experimental.set_transmission_actuator_state_variables(
     articulated_actor, transmission_index, actuator_state
 )
 ```

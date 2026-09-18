@@ -169,8 +169,8 @@ Pass `RodActorParams` to the experimental free function `CreateRodActor` / `crea
 | `colliderType` | `ColliderType` | `None` | `PointCloud` or `Auto` enables a point-cloud collider. |
 | `pointCloudCollider` | `PointCloudColliderParams` | Default | [Point-cloud collider parameters](../contact.md#pointcloudcolliderparams) shared with shell actors. |
 | `hasGravity` | `bool` | `true` | Whether the rod is affected by scene gravity. |
-| `useVisualMeshContact` | `bool` | `false` | Samples contact on the visual mesh instead of the centerline. |
-| `visualMeshContactElementType` | `ActorBoundaryElementType` | `Default` | Contact sampling on the visual mesh. |
+| `useContactSkin` | `bool` | `false` | Samples contact on the shape's contact skin instead of the centerline. |
+| `contactSkinElementType` | `ActorBoundaryElementType` | `Default` | Contact sampling on the contact skin. |
 
 ### `RodMaterialParams`
 
@@ -188,7 +188,7 @@ See [Parameter Selection](#parameter-selection) for formulas relating these para
 
 ## Contact
 
-By default, a rod's colliding samples lie along its centerline. For rods with an embedded triangular visual mesh, `useVisualMeshContact` instead places those samples on that surface and transmits contact forces to the rod DoFs through the skinning Jacobian. This mode requires a shape with both a visual mesh and embedding data.
+By default, a rod's colliding samples lie along its centerline. Set `useContactSkin` to place them on the triangular [`ModelData::contactSkinMesh`](pathname:///generated/api/v1.0.0/cpp/structsuperdex_1_1ModelData.html) instead and transmit contact forces to the rod DoFs through its skinning Jacobian. The contact skin and its rod embedding data are required. It is independent of the optional visual mesh, which remains rendering geometry.
 
 Rods have no collider by default. Set `colliderType` to `PointCloud` or `Auto` to enable a [point-cloud collider](../contact.md#double-integral-generalization), whose collider integral is taken over the centerline. See [Contact Roles](../contact.md#contact-roles) for the distinction between colliding samples and colliders.
 
@@ -196,7 +196,7 @@ Rods have no collider by default. Set `colliderType` to `PointCloud` or `Auto` t
 
 - **[Mass on Rod Spring](../../examples/tendons_rods/mass_on_rod_spring.md)**: hangs a rigid mass from a helical spring, exercising curved reference geometry and bend-twist coupling, and derives constraint stiffnesses from the rod's own stiffness coefficients by dimensional analysis.
   - Python example — `examples/example_mass_on_rod_spring.py`
-- **[Choosing a Tendon Model](../../examples/tendons_rods/tendon_model_fidelity.md)**: compares a contact-routed rod tendon with reduced spatial-tendon and linear-transmission models, including tubular visual-mesh contact and rod endpoint constraints.
+- **[Choosing a Tendon Model](../../examples/tendons_rods/tendon_model_fidelity.md)**: compares a contact-routed rod tendon with reduced spatial-tendon and linear-transmission models, including tubular contact-skin contact and rod endpoint constraints.
   - Python example — `examples/example_tendon_comparison.py`
 
 ## Related Concepts

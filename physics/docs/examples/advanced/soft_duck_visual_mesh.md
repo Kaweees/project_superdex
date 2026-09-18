@@ -26,13 +26,13 @@ For C++ asset-authoring workflows, `superdex::model_utils::GenerateVisualMeshEmb
 :::
 
 ```python
-import superdex.physics as physics
+import superdex.physics as sdp
 from superdex.physics.paths import resolve_asset
 
-physics.initialize(num_worker_threads=0)
-scene = physics.create_scene("Soft Body Visual Mesh Scene")
+sdp.initialize(num_worker_threads=0)
+scene = sdp.create_scene("Soft Body Visual Mesh Scene")
 
-shape_with_visual_mesh = physics.load_shape_from_file(
+shape_with_visual_mesh = sdp.load_shape_from_file(
     file_path=str(resolve_asset("duck/duck_coarse.mochi.h5")),
 )
 ```
@@ -42,8 +42,8 @@ shape_with_visual_mesh = physics.load_shape_from_file(
 The example extracts the tetrahedral simulation mesh and creates a second shape without the embedded visual mesh:
 
 ```python
-simulation_mesh = physics.get_shape_mesh(shape_with_visual_mesh)
-shape_without_visual_mesh = physics.create_mesh_shape(simulation_mesh)
+simulation_mesh = sdp.get_shape_mesh(shape_with_visual_mesh)
+shape_without_visual_mesh = sdp.create_mesh_shape(simulation_mesh)
 ```
 
 For an actor without a visual mesh, the debugger falls back to the triangular boundary surface derived from the tetrahedral simulation mesh. This is different from a separately authored visual mesh even though both are triangular surfaces.
@@ -56,15 +56,15 @@ The two actors differ only in their shapes and horizontal positions:
 visual_mesh_actor = scene.create_soft_actor(
     name="duck_with_visual_mesh",
     shape=shape_with_visual_mesh,
-    world_from_local=physics.TransformRT(translation=[-1.0, 0.5, -0.5]),
+    world_from_local=sdp.TransformRT(translation=[-1.0, 0.5, -0.5]),
 )
 simulation_mesh_actor = scene.create_soft_actor(
     name="duck_without_visual_mesh",
     shape=shape_without_visual_mesh,
-    world_from_local=physics.TransformRT(translation=[0.0, 0.5, -0.5]),
+    world_from_local=sdp.TransformRT(translation=[0.0, 0.5, -0.5]),
 )
 
-plane_shape = physics.create_plane_shape(normal=[0, 1, 0], distance=0.0)
+plane_shape = sdp.create_plane_shape(normal=[0, 1, 0], distance=0.0)
 ground_actor = scene.create_rigid_actor(
     name="ground", shape=plane_shape, is_static=True
 )
@@ -74,19 +74,19 @@ The left duck therefore renders the embedded visual mesh, while the right duck e
 
 ## Simulation and Lifecycle
 
-The example attaches the remote debugger and advances both actors at 60 Hz. As in the basic examples, explicit actor and scene destruction demonstrates each lifecycle operation; destroying the scene also destroys its actors, and [`physics.shutdown()`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.shutdown) also destroys remaining scenes.
+The example attaches the remote debugger and advances both actors at 60 Hz. As in the basic examples, explicit actor and scene destruction demonstrates each lifecycle operation; destroying the scene also destroys its actors, and [`sdp.shutdown()`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.shutdown) also destroys remaining scenes.
 
 ```python
 TIME_STEP = 1.0 / 60.0  # [s]
-if physics.debugger.attach():
-    while physics.debugger.is_attached():
+if sdp.debugger.attach():
+    while sdp.debugger.is_attached():
         scene.step(TIME_STEP)
 
 scene.destroy_actor(visual_mesh_actor)
 scene.destroy_actor(simulation_mesh_actor)
 scene.destroy_actor(ground_actor)
-physics.destroy_scene(scene)
-physics.shutdown()
+sdp.destroy_scene(scene)
+sdp.shutdown()
 ```
 
 ## Running

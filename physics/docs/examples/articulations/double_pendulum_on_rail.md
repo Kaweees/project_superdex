@@ -33,26 +33,26 @@ An articulated actor has a **fixed** joint topology and is more efficient and ro
 An articulated actor is described by parallel `joints[]` and `links[]` arrays, where `joints[i]` is the inbound joint of `links[i]` and `parent_link = i - 1` forms a serial chain. `joint.parent_link_from_joint` places the joint frame in its parent link's frame; `link.parent_joint_from_link` places the link body relative to its inbound joint frame.
 
 ```python
-params = physics.ArticulatedActorParams(name="DoublePendulumOnRail")
-params.world_from_root = physics.TransformRT(translation=[0, 0.75, 0])
+params = sdp.ArticulatedActorParams(name="DoublePendulumOnRail")
+params.world_from_root = sdp.TransformRT(translation=[0, 0.75, 0])
 params.joints = [
     # Root weld: fixes the rail housing to the world (0 DoFs).
-    physics.ArticulatedJointParams(name="CeilingWeld", type=physics.ArticulatedJointType.HARD),
+    sdp.ArticulatedJointParams(name="CeilingWeld", type=sdp.ArticulatedJointType.HARD),
     # Horizontal rail with soft limits, viscous friction, and armature inertia.
-    physics.ArticulatedJointParams(
+    sdp.ArticulatedJointParams(
         name="Rail",
-        type=physics.ArticulatedJointType.PRISMATIC,
+        type=sdp.ArticulatedJointType.PRISMATIC,
         axis=[1, 0, 0],
         min_limit=[-0.2, 0, 0],  # scalar limit times axis
         max_limit=[0.2, 0, 0],
         limit_stiffness=250.0,
         limit_damping=8.8,
-        friction=physics.ArticulatedJointFrictionParams(viscous=0.018),
+        friction=sdp.ArticulatedJointFrictionParams(viscous=0.018),
         inertia=0.125,
     ),
     # Upper pendulum hinge (revolute about Z) and lower ball joint (spherical).
-    physics.ArticulatedJointParams(name="UpperSwing", type=physics.ArticulatedJointType.REVOLUTE, axis=[0, 0, -1]),
-    physics.ArticulatedJointParams(name="LowerSwing", type=physics.ArticulatedJointType.SPHERICAL),
+    sdp.ArticulatedJointParams(name="UpperSwing", type=sdp.ArticulatedJointType.REVOLUTE, axis=[0, 0, -1]),
+    sdp.ArticulatedJointParams(name="LowerSwing", type=sdp.ArticulatedJointType.SPHERICAL),
 ]
 params.links = [
     # RailHousing, Cart, UpperArm, LowerArm — each a Box collider with a
@@ -88,13 +88,13 @@ Read the joint-space pose, the world transforms of every link, and the joint vel
 ```python
 num_dofs = articulation.get_num_dofs()
 
-pose = physics.DynamicArrayReal(num_dofs)
+pose = sdp.DynamicArrayReal(num_dofs)
 articulation.get_articulated_pose(pose)
 
-transforms = physics.DynamicArrayTransformRT(len(articulation.get_nested_link_actors()))
+transforms = sdp.DynamicArrayTransformRT(len(articulation.get_nested_link_actors()))
 articulation.get_articulated_link_transforms(transforms)
 
-velocities = physics.DynamicArrayReal(num_dofs)
+velocities = sdp.DynamicArrayReal(num_dofs)
 articulation.get_articulated_joint_velocities(velocities)
 ```
 
@@ -123,7 +123,7 @@ Per-joint friction (viscous/coulomb) and armature inertia can be read and change
 
 ```python
 friction = list(articulation.get_articulated_joint_friction_params())  # one per joint
-friction[2] = physics.ArticulatedJointFrictionParams(viscous=0.022)   # damp the revolute
+friction[2] = sdp.ArticulatedJointFrictionParams(viscous=0.022)   # damp the revolute
 articulation.set_articulated_joint_friction_params(friction)
 
 inertia = articulation.get_articulated_joint_inertia_params()     # one per joint
@@ -183,7 +183,7 @@ scene.enable_actor_contact_symmetric(
     links[len(links) - 1],
     ball.get_handle(),
     enable=True,
-    include_nested_actors=physics.IncludeNestedActors.NO,
+    include_nested_actors=sdp.IncludeNestedActors.NO,
 )
 ```
 
@@ -214,7 +214,7 @@ The same scene ships as a declarative [prefab](../../concepts/prefabs.mdx) — t
 
 **Source**: `assets/samples/articulations_double_pendulum_on_rail.mochi_scene`
 
-Load it into a fresh scene (or use [`physics.prefab.add_to_scene(...)`](pathname:///generated/api/v1.0.0/python/api/prefab.html#superdex.physics.prefab.add_to_scene) / C++ `prefab::AddToScene(...)` to add it into an existing one):
+Load it into a fresh scene (or use [`sdp.prefab.add_to_scene(...)`](pathname:///generated/api/v1.0.0/python/api/prefab.html#superdex.physics.prefab.add_to_scene) / C++ `prefab::AddToScene(...)` to add it into an existing one):
 
 ```python
 from superdex.physics.utils.scene_helpers import create_scene_from_prefab

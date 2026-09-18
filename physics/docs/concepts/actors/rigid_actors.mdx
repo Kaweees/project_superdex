@@ -190,7 +190,7 @@ Actor* sphere = scene->CreateRigidActor(params, error);
 
 ```python
 # Load a sphere mesh shape
-sphere_shape = mochi.load_shape_from_file(
+sphere_shape = sdp.load_shape_from_file(
     file_path=str(ASSETS_PATH / "sphere/icosphere_3subdiv.1.mochi.json"),
     bake_scale=[0.2, 0.2, 0.2],
 )
@@ -200,8 +200,8 @@ sphere_actor = scene.create_rigid_actor(
     name="sphere",
     shape=sphere_shape,
     density=1000.0,                    # kg/m^3
-    collider_type=mochi.ColliderType.SPHERE,
-    world_from_local=mochi.TransformRT(translation=[0, 1.2, 0]),
+    collider_type=sdp.ColliderType.SPHERE,
+    world_from_local=sdp.TransformRT(translation=[0, 1.2, 0]),
 )
 ```
 
@@ -235,7 +235,7 @@ Actor* ground = scene->CreateRigidActor(params, error);
 
 ```python
 # Create an implicit plane shape (no mesh needed)
-plane_shape = mochi.create_plane_shape(normal=[0, 1, 0], distance=0)
+plane_shape = sdp.create_plane_shape(normal=[0, 1, 0], distance=0)
 
 # Create a static ground plane
 ground_actor = scene.create_rigid_actor(

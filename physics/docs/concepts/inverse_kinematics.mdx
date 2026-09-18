@@ -25,8 +25,8 @@ The IK solver reconfigures a physics scene into a static optimization problem by
 
 - Timestep is set to infinity ($dt = \infty$)
 - Gravity is zeroed out
-- Friction (Coulomb and viscous) is disabled
-- Inertia and joint friction are removed
+- Contact dissipation (Coulomb and viscous friction, plus normal damping) is disabled
+- Inertia and joint friction are disabled
 
 The solver then calls [`Scene::Step`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Scene.html) with an infinite timestep, which reduces the equations of motion to the quasistatic equilibrium condition:
 
@@ -135,7 +135,7 @@ Scene* ikScene = context->CreateScene("IKScene");
 <TabItem value="python" label="Python">
 
 ```python
-ik_scene = mochi.create_scene("IKScene")
+ik_scene = sdp.create_scene("IKScene")
 ```
 
 </TabItem>
@@ -175,7 +175,7 @@ mochi::experimental::IKSolver* ikSolver = mochi::experimental::CreateIKSolver(ik
 <TabItem value="python" label="Python">
 
 ```python
-ik_solver = mochi.experimental.create_ik_solver(ik_scene)
+ik_solver = sdp.experimental.create_ik_solver(ik_scene)
 ```
 
 </TabItem>
@@ -330,7 +330,7 @@ mochi::experimental::DestroyIKSolver(ikSolver, context, error);  // also destroy
 <TabItem value="python" label="Python">
 
 ```python
-mochi.experimental.destroy_ik_solver(ik_solver)  # also destroys ik_scene
+sdp.experimental.destroy_ik_solver(ik_solver)  # also destroys ik_scene
 ```
 
 </TabItem>
@@ -357,14 +357,14 @@ mochi::experimental::IKSolver* ikSolver = mochi::experimental::CreateIKSolver(ik
 
 ```python
 # Add a static box obstacle to the IK scene
-obstacle_params = mochi.RigidActorParams()
-obstacle_params.shape = mochi.BoxShape(half_extents=[0.3, 0.15, 0.3])
+obstacle_params = sdp.RigidActorParams()
+obstacle_params.shape = sdp.BoxShape(half_extents=[0.3, 0.15, 0.3])
 obstacle_params.transform = obstacle_transform
-obstacle_params.body_type = mochi.BodyType.STATIC
+obstacle_params.body_type = sdp.BodyType.STATIC
 ik_scene.create_rigid_actor(obstacle_params)
 
 # Then create the IK solver as usual
-ik_solver = mochi.experimental.create_ik_solver(ik_scene)
+ik_solver = sdp.experimental.create_ik_solver(ik_scene)
 ```
 
 </TabItem>
@@ -395,7 +395,7 @@ The `weight` parameter on `CreatePositionTarget` / `CreateRotationTarget` is map
 
 ## Tips and Best Practices
 
-**Use a separate scene for IK.** The IK solver sets the scene to infinite timestep, zero gravity, and removes friction and inertia. This makes the scene unusable for visualization or dynamic simulation.
+**Use a separate scene for IK.** The IK solver sets the scene to infinite timestep and zero gravity, and disables contact dissipation, inertia, and joint friction. This makes the scene unusable for visualization or dynamic simulation.
 
 **Dual-scene pattern.** Create one scene for rendering/simulation and a second scene for IK. After each `SolveIK` call, copy the resulting pose to the visualization scene with [`SetArticulatedPoseFromJoints`](pathname:///generated/api/v1.0.0/cpp/classsuperdex_1_1Actor.html). Suppress velocities on the visualization actor after copying to prevent drift.
 

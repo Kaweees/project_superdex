@@ -81,17 +81,17 @@ actor->AddArticulatedPoseController(params, error);
 
 ```python
 num_links = len(actor.get_nested_link_actors())
-params = mochi.PoseControllerParams(num_links)
+params = sdp.PoseControllerParams(num_links)
 
-params.joint_tracking[joint_link] = mochi.PoseTrackingParams(
+params.joint_tracking[joint_link] = sdp.PoseTrackingParams(
     stiffness=500.0,
     damping=50.0,
 )
-params.link_pos_tracking[end_effector_link] = mochi.PoseTrackingParams(
+params.link_pos_tracking[end_effector_link] = sdp.PoseTrackingParams(
     stiffness=300.0,
     damping=30.0,
 )
-params.link_rot_tracking[end_effector_link] = mochi.PoseTrackingParams(
+params.link_rot_tracking[end_effector_link] = sdp.PoseTrackingParams(
     stiffness=25.0,
     damping=5.0,
 )
@@ -194,7 +194,7 @@ actor->SetArticulatedPoseControllerParams(params, error);
 
 ```python
 num_links = len(actor.get_nested_link_actors())
-params = mochi.PoseControllerParams(num_links)
+params = sdp.PoseControllerParams(num_links)
 actor.get_articulated_pose_controller_params(out_params=params)
 
 params.joint_tracking[joint_link].stiffness = 200.0
@@ -227,7 +227,7 @@ actor->CancelQuery(query);
 
 ```python
 query = actor.register_query(
-    mochi.QueryType.ARTICULATED_CONTROLLER_FORCE
+    sdp.QueryType.ARTICULATED_CONTROLLER_FORCE
 )
 scene.step(dt)
 force = actor.get_articulated_controller_force()
