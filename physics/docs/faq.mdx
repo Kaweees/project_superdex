@@ -33,7 +33,7 @@ For detailed explanations and complete workflows, start with the relevant pages 
 
 - **Benchmark `ParallelCG` for large deformable systems.** For scenes with deformable actors and many degrees of freedom, the experimental [`ParallelCG`](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.LinearSolverType) linear solver may be substantially faster on multicore devices. Benchmark it on the target workload and hardware. `ParallelCG` is nondeterministic and should not be used when exact reproducibility is required.
 
-- **Benchmark single and double precision.** Single precision typically provides higher arithmetic throughput and reduces memory traffic, while double precision may converge in fewer nonlinear iterations. Benchmark both on representative workloads and use the faster precision that meets the accuracy requirements.
+- **Benchmark FP32 and FP64.** Single precision (FP32) typically provides higher arithmetic throughput and reduces memory traffic, while double precision (FP64) may converge in fewer nonlinear iterations. Benchmark both on representative workloads and use the faster precision that meets the accuracy requirements.
 
 - **Tune the worker count.** Start with the [hardware-dependent default](./concepts/context.mdx#worker-configuration), then benchmark several counts on the target device and use the fastest measured configuration. More worker threads are not necessarily faster and can be slower for small scenes.
 
@@ -125,7 +125,7 @@ If the motion is unintended, add damping to the mechanism producing it. Use [nor
 
 ### Does "Linear solver didn't converge" mean the step failed?
 
-Not necessarily. The warning means that a linear solve within the nonlinear solve did not reach its requested tolerance; it does not by itself mean that the simulation step failed. The resulting Newton step may still be appropriate. However, repeatedly reaching the maximum linear iteration count may indicate that the solver has stagnated and is spending substantial time on iterations that no longer improve the solution. Reducing the [maximum iteration count](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.LinearSolverParams.max_iter) can improve performance if it does not materially affect task-relevant results. If the warning persists or accompanies divergence or unacceptable behavior, try double precision or a smaller time-step size.
+Not necessarily. The warning means that a linear solve within the nonlinear solve did not reach its requested tolerance; it does not by itself mean that the simulation step failed. The resulting Newton step may still be appropriate. However, repeatedly reaching the maximum linear iteration count may indicate that the solver has stagnated and is spending substantial time on iterations that no longer improve the solution. Reducing the [maximum iteration count](pathname:///generated/api/v1.0.0/python/api/physics.html#superdex.physics.LinearSolverParams.max_iter) can improve performance if it does not materially affect task-relevant results. If the warning persists or accompanies divergence or unacceptable behavior, try double precision (FP64) or a smaller time-step size.
 
 ### Does a nonlinear solver status of `Stopped` mean the step failed?
 
@@ -139,4 +139,4 @@ Return to a known-good state, reduce the [time-step size](./concepts/dynamics.md
 
 ### What does the "Matrix does not seem to be SPD" warning mean?
 
-The [linear solver](./concepts/solvers.md#linear-solvers) detected that its matrix did not behave as symmetric positive definite. Finite-precision effects can make a mathematically SPD system appear non-SPD to the solver. An isolated warning does not necessarily invalidate the step; if it accompanies instability, try double precision.
+The [linear solver](./concepts/solvers.md#linear-solvers) detected that its matrix did not behave as symmetric positive definite. Finite-precision effects can make a mathematically SPD system appear non-SPD to the solver. An isolated warning does not necessarily invalidate the step; if it accompanies instability, try double precision (FP64).

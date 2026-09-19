@@ -27,7 +27,7 @@ This command builds physics, robotics and Gym together. The README's extras tabl
 covers the other combinations.
 
 :::note FP64 native simulation
-Build the `double` extra and set `SUPERDEX_PRECISION=double` before importing
+Build the `fp64` extra and set `SUPERDEX_PRECISION=fp64` before importing
 SuperDex to run the native Physics and Robotics simulation in FP64. SuperDex Lab
 has no separate FP64 package: its shipped Gym environments retain `float32`
 observation and action spaces. This is FP64 native simulation under the existing
